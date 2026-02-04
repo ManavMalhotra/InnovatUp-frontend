@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, useAnimation, type Variants } from 'framer-motion';
+import { motion, useAnimation, type Variants } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Zap, Users, Rocket, Code, Sparkles } from 'lucide-react';
 
@@ -137,7 +137,7 @@ export default function LandingPage() {
           >
             College Ideathon 2026
           </motion.p>
-          
+
           <h1 className="font-space-grotesk font-bold text-6xl md:text-8xl lg:text-9xl tracking-tighter leading-[0.9] mb-8">
             <motion.span
               initial={{ opacity: 0, y: 50 }}
@@ -233,8 +233,8 @@ export default function LandingPage() {
                   About InnovatUp
                 </h3>
                 <p className="text-white/60 text-lg leading-relaxed max-w-lg">
-                  A 48-hour ideathon where teams transform concepts into working prototypes. 
-                  Get mentorship from industry leaders, compete for prizes, and build something 
+                  A 48-hour ideathon where teams transform concepts into working prototypes.
+                  Get mentorship from industry leaders, compete for prizes, and build something
                   that matters.
                 </p>
               </div>
@@ -278,7 +278,7 @@ export default function LandingPage() {
                 <Users className="w-5 h-5 text-teal-400" />
                 <h3 className="font-space-grotesk font-bold text-xl">Sponsors</h3>
               </div>
-              
+
               <div className="marquee h-[280px]">
                 <div className="marquee-content flex flex-col gap-4">
                   {[...sponsors, ...sponsors].map((sponsor, i) => (
