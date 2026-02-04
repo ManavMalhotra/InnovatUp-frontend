@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 export default function BackgroundWrapper() {
   return (
@@ -18,7 +18,7 @@ export default function BackgroundWrapper() {
           ease: 'easeInOut',
         }}
       />
-      
+
       {/* Blob 2 - Teal */}
       <motion.div
         className="absolute w-[500px] h-[500px] rounded-full bg-teal-500/20 blur-[100px]"
@@ -34,7 +34,7 @@ export default function BackgroundWrapper() {
           ease: 'easeInOut',
         }}
       />
-      
+
       {/* Blob 3 - Purple */}
       <motion.div
         className="absolute w-[400px] h-[400px] rounded-full bg-purple-500/15 blur-[100px]"
@@ -52,7 +52,7 @@ export default function BackgroundWrapper() {
       />
 
       {/* Grid overlay */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
           backgroundImage: `
