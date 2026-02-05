@@ -1,326 +1,243 @@
 import { useEffect, useRef, useLayoutEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Calendar } from 'lucide-react';
+import { ArrowRight, CalendarBlank, CaretDown } from '@phosphor-icons/react';
+import AnimatedLogo from '../components/AnimatedLogo';
+import CountdownTimer from '../components/CountdownTimer';
+import { siteConfig } from '../data/siteConfig';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Wireframe SVG Component
-function WireframeObject({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 400 400"
-      className={`${className} wireframe-glow`}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* Outer icosahedron-like wireframe */}
-      <path
-        d="M200 20L380 120V280L200 380L20 280V120L200 20Z"
-        stroke="#B6FF2E"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity="0.9"
-      />
-      <path
-        d="M20 120L200 200L380 120"
-        stroke="#B6FF2E"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity="0.7"
-      />
-      <path
-        d="M200 200V380"
-        stroke="#B6FF2E"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity="0.7"
-      />
-      <path
-        d="M200 20L200 200"
-        stroke="#B6FF2E"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity="0.5"
-      />
-      <path
-        d="M20 280L200 200"
-        stroke="#B6FF2E"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity="0.5"
-      />
-      <path
-        d="M380 280L200 200"
-        stroke="#B6FF2E"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity="0.5"
-      />
-      {/* Inner geometric details */}
-      <circle
-        cx="200"
-        cy="200"
-        r="80"
-        stroke="#B6FF2E"
-        strokeWidth="1"
-        opacity="0.4"
-      />
-      <circle
-        cx="200"
-        cy="200"
-        r="40"
-        stroke="#B6FF2E"
-        strokeWidth="1"
-        opacity="0.3"
-      />
-      {/* Corner accents */}
-      <path
-        d="M200 20L220 50L180 50Z"
-        stroke="#B6FF2E"
-        strokeWidth="1"
-        opacity="0.6"
-      />
-      <path
-        d="M380 120L350 140L350 100Z"
-        stroke="#B6FF2E"
-        strokeWidth="1"
-        opacity="0.6"
-      />
-      <path
-        d="M20 120L50 100L50 140Z"
-        stroke="#B6FF2E"
-        strokeWidth="1"
-        opacity="0.6"
-      />
-    </svg>
-  );
-}
-
 export default function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const wireframeRef = useRef<HTMLDivElement>(null);
-  const characterRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLDivElement>(null);
-  const subheadlineRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
-  const labelRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const logoContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-play entrance animation
+  // Entrance animation
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Wireframe entrance
       tl.fromTo(
-        wireframeRef.current,
-        { scale: 0.85, opacity: 0, rotate: 8 },
-        { scale: 1, opacity: 1, rotate: 0, duration: 0.9 },
-        0
-      );
-
-      // Character entrance
-      tl.fromTo(
-        characterRef.current,
-        { x: '18vw', opacity: 0 },
-        { x: 0, opacity: 1, duration: 0.8 },
+        '.hero-logo-entrance',
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.8 },
         0.1
       );
 
-      // Label entrance
       tl.fromTo(
-        labelRef.current,
-        { y: -20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5 },
-        0.2
+        '.hero-headline .word',
+        { y: 50, opacity: 0, rotateX: -20 },
+        { y: 0, opacity: 1, rotateX: 0, duration: 0.8, stagger: 0.1 },
+        0.3
       );
 
-      // Headline entrance (word by word)
-      const words = headlineRef.current?.querySelectorAll('.word');
-      if (words) {
-        tl.fromTo(
-          words,
-          { x: -40, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.6, stagger: 0.08 },
-          0.3
-        );
-      }
-
-      // Subheadline entrance
       tl.fromTo(
-        subheadlineRef.current,
-        { y: 18, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5 },
-        0.6
-      );
-
-      // CTA entrance
-      tl.fromTo(
-        ctaRef.current,
-        { y: 18, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5 },
+        '.hero-subheadline',
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6 },
         0.7
+      );
+
+      tl.fromTo(
+        '.hero-countdown',
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5 },
+        0.9
+      );
+
+      tl.fromTo(
+        '.hero-cta',
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.1 },
+        1.0
+      );
+
+      tl.fromTo(
+        '.hero-scroll-indicator',
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5 },
+        1.2
       );
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  // Scroll-driven exit animation
+  // Scroll-driven parallax
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
     const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
+      gsap.to(logoContainerRef.current, {
+        y: '15%',
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=130%',
-          pin: true,
-          scrub: 0.6,
-          onLeaveBack: () => {
-            // Reset all elements to visible when scrolling back
-            gsap.set([wireframeRef.current, characterRef.current, headlineRef.current, subheadlineRef.current, ctaRef.current, labelRef.current], {
-              opacity: 1, x: 0, y: 0, scale: 1
-            });
-          }
+          end: 'bottom top',
+          scrub: 1,
         },
       });
 
-      // EXIT phase (70% - 100%)
-      scrollTl.fromTo(
-        headlineRef.current,
-        { x: 0, opacity: 1 },
-        { x: '-28vw', opacity: 0.25, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        subheadlineRef.current,
-        { x: 0, opacity: 1 },
-        { x: '-20vw', opacity: 0.25, ease: 'power2.in' },
-        0.72
-      );
-
-      scrollTl.fromTo(
-        ctaRef.current,
-        { y: 0, opacity: 1 },
-        { y: '-10vh', opacity: 0, ease: 'power2.in' },
-        0.85
-      );
-
-      scrollTl.fromTo(
-        labelRef.current,
-        { opacity: 1 },
-        { opacity: 0, ease: 'power2.in' },
-        0.75
-      );
-
-      scrollTl.fromTo(
-        characterRef.current,
-        { x: 0, opacity: 1 },
-        { x: '18vw', opacity: 0.25, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        wireframeRef.current,
-        { scale: 1, opacity: 1 },
-        { scale: 0.92, opacity: 0.35, ease: 'power2.in' },
-        0.7
-      );
+      gsap.to(contentRef.current, {
+        y: '-10%',
+        opacity: 0.3,
+        scrollTrigger: {
+          trigger: section,
+          start: '30% top',
+          end: 'bottom top',
+          scrub: 1,
+        },
+      });
     }, section);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <div
+    <section
       ref={sectionRef}
-      className="section-pinned bg-neon-dark flex items-center justify-center"
+      id="hero"
+      className="relative min-h-screen flex items-center overflow-hidden bg-background"
     >
-      {/* Background vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(7,8,13,0.8)_100%)]" />
-
-      {/* Wireframe object (center) */}
-      <div
-        ref={wireframeRef}
-        className="absolute left-1/2 top-[52%] -translate-x-1/2 -translate-y-1/2 w-[min(52vw,720px)] z-10 float-animation"
-      >
-        <WireframeObject />
+      {/* Background gradients */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.15)_0%,transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(88,166,255,0.1)_0%,transparent_50%)]" />
       </div>
 
-      {/* Hero character (right) */}
+      {/* Grid pattern */}
       <div
-        ref={characterRef}
-        className="absolute right-[6vw] top-[18vh] h-[72vh] z-20"
-      >
-        <img
-          src="/hero_character.jpg"
-          alt="Innovator"
-          className="h-full w-auto object-contain mask-image-gradient"
-          style={{
-            maskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
-          }}
-        />
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(240,246,252,0.1) 1px, transparent 1px),
+                           linear-gradient(90deg, rgba(240,246,252,0.1) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+
+      {/* Main container - split layout on desktop */}
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-12 min-h-screen lg:min-h-0 py-0 lg:py-0">
+
+          {/* Left: Content */}
+          <div
+            ref={contentRef}
+            className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left lg:pt-0"
+          >
+            {/* Headline */}
+            <h1 className="hero-headline font-display font-bold 
+                           text-[2.5rem] leading-[0.95]
+                           sm:text-5xl 
+                           md:text-6xl 
+                           lg:text-7xl 
+                           xl:text-8xl 
+                           2xl:text-[6.5rem]
+                           tracking-tight">
+              {siteConfig.hero.headline.map((word, index) => (
+                <span
+                  key={word}
+                  className={`word block ${index === siteConfig.hero.headline.length - 1
+                    ? 'text-gradient'
+                    : 'text-foreground'
+                    }`}
+                >
+                  {word}
+                </span>
+              ))}
+            </h1>
+
+            {/* Subheadline */}
+            <p className="hero-subheadline body-text mt-6 max-w-sm sm:max-w-md lg:max-w-lg">
+              {siteConfig.hero.subheadline}
+            </p>
+
+            {/* Countdown Timer */}
+            <div className="hero-countdown mt-8">
+              <p className="label-mono text-muted-foreground mb-3">Event starts in</p>
+              <CountdownTimer />
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="hero-cta flex flex-col sm:flex-row items-center gap-4 mt-8 w-full sm:w-auto">
+              <Link
+                to="/register"
+                className="btn-primary group text-base w-full sm:w-auto justify-center"
+              >
+                {siteConfig.hero.ctaPrimary}
+                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" weight="bold" />
+              </Link>
+              <button
+                onClick={() => document.getElementById('timeline')?.scrollIntoView({ behavior: 'smooth' })}
+                className="btn-secondary group text-sm w-full sm:w-auto justify-center"
+              >
+                <CalendarBlank className="mr-2 w-4 h-4" weight="duotone" />
+                {siteConfig.hero.ctaSecondary}
+              </button>
+            </div>
+          </div>
+
+          {/* Right: Logo - Large on desktop, centered on mobile */}
+          <div
+            ref={logoContainerRef}
+            className="hero-logo-entrance flex-shrink-0 flex items-center justify-center
+                       order-first lg:order-last
+                       mt-0 mb-8 lg:my-0"
+          >
+            {/* Responsive Opacity Wrapper: 10% on mobile, 100% on desktop */}
+            <div className="opacity-10 md:opacity-100 transition-opacity duration-500">
+              <AnimatedLogo
+                size={400}
+                className="w-40 h-40 
+                           sm:w-48 sm:h-48 
+                           md:w-56 md:h-56 
+                           lg:w-80 lg:h-80 
+                           xl:w-96 xl:h-96 
+                           2xl:w-[28rem] 2xl:h-[28rem]"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Micro label (top-left) */}
-      <div
-        ref={labelRef}
-        className="absolute left-[8vw] top-[14vh] z-30"
+      {/* Scroll indicator */}
+      <motion.div
+        className="hero-scroll-indicator absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 
+                   flex flex-col items-center gap-2 cursor-pointer"
+        onClick={() => document.getElementById('what-is')?.scrollIntoView({ behavior: 'smooth' })}
+        animate={{ y: [0, 8, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <span className="label-mono text-neon-green">College Ideathon 2026</span>
-      </div>
+        <span className="text-xs text-muted-foreground hidden sm:block">Scroll to explore</span>
+        <CaretDown className="w-5 h-5 text-primary" weight="bold" />
+      </motion.div>
 
-      {/* Headline (left) */}
-      <div
-        ref={headlineRef}
-        className="absolute left-[8vw] top-[30vh] max-w-[42vw] z-30"
-      >
-        <h1 className="headline-xl font-display text-neon-white">
-          <span className="word block">Innovate.</span>
-          <span className="word block">Build.</span>
-          <span className="word block text-neon-green">Launch.</span>
-        </h1>
+      {/* Decorative particles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1.5 h-1.5 rounded-full bg-primary/50"
+            style={{
+              left: `${10 + i * 11}%`,
+              top: `${15 + (i % 4) * 22}%`,
+            }}
+            animate={{
+              y: [0, -25, 0],
+              opacity: [0.4, 0.8, 0.4],
+            }}
+            transition={{
+              duration: 3 + i * 0.4,
+              repeat: Infinity,
+              delay: i * 0.25,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
       </div>
-
-      {/* Subheadline (left) */}
-      <div
-        ref={subheadlineRef}
-        className="absolute left-[8vw] top-[62vh] max-w-[34vw] z-30"
-      >
-        <p className="body-text">
-          A 48-hour sprint where ideas become working prototypes—mentors, prizes, and real momentum.
-        </p>
-      </div>
-
-      {/* CTA (left) */}
-      <div
-        ref={ctaRef}
-        className="absolute left-[8vw] top-[74vh] z-30 flex flex-col gap-4"
-      >
-        <Link to="/register" className="btn-primary group">
-          Register Now
-          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </Link>
-        <button 
-          onClick={() => document.getElementById('timeline')?.scrollIntoView({ behavior: 'smooth' })}
-          className="flex items-center gap-2 text-sm text-neon-gray hover:text-neon-white transition-colors"
-        >
-          <Calendar className="w-4 h-4" />
-          View Timeline
-        </button>
-      </div>
-    </div>
+    </section>
   );
 }

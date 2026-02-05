@@ -1,177 +1,79 @@
-import { useRef, useLayoutEffect } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { UserCircle, Users } from 'lucide-react';
+import { motion } from 'motion/react';
+import { siteConfig } from '../data/siteConfig';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const cards = [
-  { title: '1:1 Sessions', icon: UserCircle, rotation: -2 },
-  { title: 'Group Reviews', icon: Users, rotation: 3 },
-];
-
+/**
+ * MentorshipSection - Currently minimal since mentors array is empty
+ * Will be expanded when mentor data is provided
+ */
 export default function MentorshipSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const portraitRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLDivElement>(null);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=130%',
-          pin: true,
-          scrub: 0.6,
-        },
-      });
-
-      // ENTRANCE
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: '-60vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      scrollTl.fromTo(
-        headlineRef.current,
-        { x: '40vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0.05
-      );
-
-      scrollTl.fromTo(
-        bodyRef.current,
-        { x: '40vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0.1
-      );
-
-      cardsRef.current.forEach((card, i) => {
-        if (!card) return;
-        const startRotation = [-6, 6][i];
-        const endRotation = [-2, 3][i];
-        
-        scrollTl.fromTo(
-          card,
-          { y: '30vh', rotate: startRotation, opacity: 0 },
-          { y: 0, rotate: endRotation, opacity: 1, ease: 'none' },
-          0.12 + 0.03 * i
-        );
-      });
-
-      // EXIT
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: 0, opacity: 1 },
-        { x: '-18vw', opacity: 0.3, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        headlineRef.current,
-        { x: 0, opacity: 1 },
-        { x: '12vw', opacity: 0.25, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        bodyRef.current,
-        { x: 0, opacity: 1 },
-        { x: '12vw', opacity: 0.25, ease: 'power2.in' },
-        0.72
-      );
-
-      cardsRef.current.forEach((card) => {
-        if (!card) return;
-        scrollTl.fromTo(
-          card,
-          { y: 0, opacity: 1 },
-          { y: '12vh', opacity: 0.25, ease: 'power2.in' },
-          0.7
-        );
-      });
-    }, section);
-
-    return () => ctx.revert();
-  }, []);
-
-  return (
-    <div
-      ref={sectionRef}
-      className="section-pinned bg-neon-dark flex items-center"
-    >
-      {/* Portrait */}
-      <div
-        ref={portraitRef}
-        className="absolute left-[7vw] top-[18vh] w-[40vw] h-[64vh] rounded-2xl overflow-hidden shadow-card"
+  // If no mentors, show a minimal placeholder
+  if (siteConfig.mentors.length === 0) {
+    return (
+      <section
+        id="mentors"
+        className="relative py-16 bg-card/30"
       >
-        <img
-          src="/mentor_portrait.jpg"
-          alt="Mentorship"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-neon-dark/60 to-transparent" />
-      </div>
-
-      {/* Headline */}
-      <div
-        ref={headlineRef}
-        className="absolute left-[54vw] top-[22vh] max-w-[38vw]"
-      >
-        <h2 className="headline-lg font-display text-neon-white">
-          Mentorship<br />
-          <span className="text-neon-green">at every step.</span>
-        </h2>
-      </div>
-
-      {/* Body */}
-      <div
-        ref={bodyRef}
-        className="absolute left-[54vw] top-[42vh] max-w-[34vw]"
-      >
-        <p className="body-text">
-          From framing the problem to polishing the demo—mentors are available 
-          for quick reviews, debugging, and pitch prep.
-        </p>
-      </div>
-
-      {/* Cards */}
-      {cards.map((card, index) => {
-        const Icon = card.icon;
-        const positions = [
-          { left: '54vw', top: '62vh' },
-          { left: '58vw', top: '66vh' },
-        ];
-        
-        return (
-          <div
-            key={card.title}
-            ref={(el) => { cardsRef.current[index] = el; }}
-            className="absolute w-[18vw] h-[20vh] rounded-2xl bg-card border border-white/5 shadow-card p-6 flex flex-col justify-between"
-            style={{
-              left: positions[index].left,
-              top: positions[index].top,
-              transform: `rotate(${card.rotation}deg)`,
-              zIndex: 2 - index,
-            }}
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-12">
+          <motion.p
+            className="text-center text-sm text-muted-foreground"
+            initial={{ y: 20, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="w-10 h-10 rounded-lg bg-neon-green/10 flex items-center justify-center">
-              <Icon className="w-5 h-5 text-neon-green" />
-            </div>
-            <h3 className="text-lg font-display font-bold text-neon-white">
-              {card.title}
-            </h3>
-          </div>
-        );
-      })}
-    </div>
+            Industry mentors · Coming soon
+          </motion.p>
+        </div>
+      </section>
+    );
+  }
+
+  // Full mentors section when data is available
+  return (
+    <section
+      id="mentors"
+      className="relative py-24 lg:py-32 bg-card/30"
+    >
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-12">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ y: 30, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <span className="label-mono text-primary mb-4 block">Guidance</span>
+          <h2 className="headline-lg font-display text-foreground">
+            <span className="text-gradient">Mentors</span>
+          </h2>
+        </motion.div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {siteConfig.mentors.map((mentor, index) => (
+            <motion.div
+              key={mentor.name}
+              className="text-center glass-card-hover p-6"
+              initial={{ y: 30, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -4 }}
+            >
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden bg-primary/10">
+                <img
+                  src={mentor.image}
+                  alt={mentor.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="font-display font-bold text-foreground mb-1">
+                {mentor.name}
+              </h3>
+              <p className="body-text text-sm">{mentor.role}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

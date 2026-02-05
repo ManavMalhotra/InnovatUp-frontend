@@ -1,198 +1,168 @@
-import { useRef, useLayoutEffect } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Users, Lightbulb, Ticket, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { CaretDown, Question } from '@phosphor-icons/react';
+import { siteConfig } from '../data/siteConfig';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const faqCards = [
-  {
-    question: 'Do I need a team?',
-    answer: 'You can join solo and form a team at kickoff.',
-    icon: Users,
-    rotation: -1,
-  },
-  {
-    question: 'What if I\'m a beginner?',
-    answer: 'Mentors are here to help. Start simple.',
-    icon: Lightbulb,
-    rotation: 1,
-  },
-  {
-    question: 'Is it free?',
-    answer: 'Yes. Register before the deadline.',
-    icon: Ticket,
-    rotation: 3,
-  },
-];
-
 export default function FAQsSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const portraitRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const ctaRef = useRef<HTMLDivElement>(null);
+  const faqsRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
     const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=130%',
-          pin: true,
-          scrub: 0.6,
-        },
-      });
-
-      // ENTRANCE
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: '-60vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      scrollTl.fromTo(
+      gsap.fromTo(
         headlineRef.current,
-        { y: '-10vh', opacity: 0 },
-        { y: 0, opacity: 1, ease: 'none' },
-        0.05
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 70%',
+            toggleActions: 'play none none reverse',
+          },
+        }
       );
 
-      cardsRef.current.forEach((card, i) => {
-        if (!card) return;
-        const rotations = [-3, 2, 7];
-        const endRotations = [-1, 1, 3];
-        
-        scrollTl.fromTo(
-          card,
-          { x: '50vw', rotate: rotations[i], opacity: 0 },
-          { x: 0, rotate: endRotations[i], opacity: 1, ease: 'none' },
-          0.05 + 0.03 * i
+      const faqs = faqsRef.current?.querySelectorAll('.faq-item');
+      if (faqs) {
+        gsap.fromTo(
+          faqs,
+          { y: 30, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.08,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: faqsRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none reverse',
+            },
+          }
         );
-      });
-
-      scrollTl.fromTo(
-        ctaRef.current,
-        { y: '12vh', opacity: 0 },
-        { y: 0, opacity: 1, ease: 'none' },
-        0.15
-      );
-
-      // EXIT
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: 0, opacity: 1 },
-        { x: '-18vw', opacity: 0.3, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        headlineRef.current,
-        { y: 0, opacity: 1 },
-        { y: '-6vh', opacity: 0.25, ease: 'power2.in' },
-        0.7
-      );
-
-      cardsRef.current.forEach((card) => {
-        if (!card) return;
-        scrollTl.fromTo(
-          card,
-          { x: 0, opacity: 1 },
-          { x: '14vw', opacity: 0.25, ease: 'power2.in' },
-          0.7
-        );
-      });
-
-      scrollTl.fromTo(
-        ctaRef.current,
-        { opacity: 1 },
-        { opacity: 0, ease: 'power2.in' },
-        0.85
-      );
+      }
     }, section);
 
     return () => ctx.revert();
   }, []);
 
+  const toggleFAQ = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
-    <div
+    <section
       ref={sectionRef}
       id="faqs"
-      className="section-pinned bg-neon-dark flex items-center"
+      className="relative py-24 lg:py-32 bg-card/30 overflow-hidden"
     >
-      {/* Portrait */}
+      {/* Noise texture overlay */}
       <div
-        ref={portraitRef}
-        className="absolute left-[7vw] top-[18vh] w-[40vw] h-[64vh] rounded-2xl overflow-hidden shadow-card"
-      >
-        <img
-          src="/faqs_portrait.jpg"
-          alt="FAQs"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-neon-dark/60 to-transparent" />
-      </div>
+        className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
+      />
 
-      {/* Headline */}
-      <div
-        ref={headlineRef}
-        className="absolute left-[54vw] top-[18vh]"
-      >
-        <h2 className="headline-lg font-display text-neon-white">
-          <span className="text-neon-green">FAQs</span>
-        </h2>
-      </div>
+      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-12">
+        {/* Header */}
+        <div ref={headlineRef} className="text-center mb-12">
+          <span className="label-mono text-primary mb-4 block">Got questions?</span>
+          <h2 className="headline-lg font-display text-foreground">
+            <span className="text-gradient">FAQs</span>
+          </h2>
+        </div>
 
-      {/* FAQ cards */}
-      {faqCards.map((card, index) => {
-        const Icon = card.icon;
-        const positions = [
-          { left: '54vw', top: '32vh' },
-          { left: '56vw', top: '36vh' },
-          { left: '58vw', top: '40vh' },
-        ];
-        
-        return (
-          <div
-            key={card.question}
-            ref={(el) => { cardsRef.current[index] = el; }}
-            className="absolute w-[36vw] h-[20vh] rounded-2xl bg-card border border-white/5 shadow-card p-6 flex items-center gap-6"
-            style={{
-              left: positions[index].left,
-              top: positions[index].top,
-              transform: `rotate(${card.rotation}deg)`,
-              zIndex: 3 - index,
-            }}
-          >
-            <div className="w-12 h-12 rounded-xl bg-neon-green/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-6 h-6 text-neon-green" />
-            </div>
-            <div>
-              <h3 className="text-lg font-display font-bold text-neon-white">
-                {card.question}
-              </h3>
-              <p className="body-text text-sm mt-1">{card.answer}</p>
-            </div>
-          </div>
-        );
-      })}
+        {/* FAQ items */}
+        <div ref={faqsRef} className="space-y-3">
+          {siteConfig.faqs.map((faq, index) => (
+            <motion.div
+              key={index}
+              className="faq-item"
+              layout
+            >
+              <button
+                onClick={() => toggleFAQ(index)}
+                className={`w-full text-left p-5 rounded-2xl transition-all duration-300 
+                  ${openIndex === index
+                    ? 'bg-primary/10 border border-primary/20'
+                    : 'bg-card border border-border hover:border-primary/30'
+                  }`}
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <Question className={`w-5 h-5 flex-shrink-0 transition-colors
+                      ${openIndex === index ? 'text-primary' : 'text-muted-foreground'}`}
+                      weight="duotone"
+                    />
+                    <span className={`font-medium transition-colors
+                      ${openIndex === index ? 'text-foreground' : 'text-foreground'}`}
+                    >
+                      {faq.question}
+                    </span>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: openIndex === index ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <CaretDown className={`w-5 h-5 transition-colors
+                      ${openIndex === index ? 'text-primary' : 'text-muted-foreground'}`}
+                      weight="bold"
+                    />
+                  </motion.div>
+                </div>
 
-      {/* CTA */}
-      <div
-        ref={ctaRef}
-        className="absolute left-[54vw] top-[76vh]"
-      >
-        <Link to="/register" className="btn-primary group">
-          Register Now
-          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </Link>
+                <AnimatePresence>
+                  {openIndex === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <p className="body-text pt-4 pl-8">
+                        {faq.answer}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Contact CTA */}
+        <motion.div
+          className="text-center mt-10"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+        >
+          <p className="text-sm text-muted-foreground">
+            Still have questions?{' '}
+            <a
+              href={`mailto:${siteConfig.social.email}`}
+              className="text-primary hover:underline"
+            >
+              Contact us
+            </a>
+          </p>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -38,12 +38,17 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        neon: {
-          green: "#B6FF2E",
-          dark: "#07080D",
-          charcoal: "#0E111A",
-          white: "#F4F6FF",
-          gray: "#A7ACB8",
+        // Navy Blue Theme Colors
+        navy: {
+          dark: "#0D1117",
+          DEFAULT: "#161B22",
+          light: "#21262D",
+          lighter: "#30363D",
+        },
+        electric: {
+          blue: "#3B82F6",
+          sky: "#58A6FF",
+          light: "#93C5FD",
         },
       },
       fontFamily: {
@@ -62,8 +67,9 @@ module.exports = {
       boxShadow: {
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
         card: "0 28px 80px rgba(0, 0, 0, 0.55)",
-        glow: "0 0 40px rgba(182, 255, 46, 0.12)",
-        "glow-strong": "0 0 60px rgba(182, 255, 46, 0.2)",
+        glow: "0 0 40px rgba(59, 130, 246, 0.15)",
+        "glow-strong": "0 0 60px rgba(59, 130, 246, 0.25)",
+        "glow-blue": "0 8px 30px rgba(59, 130, 246, 0.35)",
       },
       keyframes: {
         "accordion-down": {
@@ -80,7 +86,7 @@ module.exports = {
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-6px)" },
+          "50%": { transform: "translateY(-8px)" },
         },
         "rotate-slow": {
           from: { transform: "rotate(0deg)" },
@@ -90,6 +96,10 @@ module.exports = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.5" },
         },
+        shimmer: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -98,6 +108,7 @@ module.exports = {
         float: "float 3.2s ease-in-out infinite",
         "rotate-slow": "rotate-slow 20s linear infinite",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        shimmer: "shimmer 3s linear infinite",
       },
     },
   },

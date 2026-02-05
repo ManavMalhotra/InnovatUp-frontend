@@ -1,117 +1,86 @@
 import { useRef, useLayoutEffect } from 'react';
+import { motion } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Crown, Medal, Sparkles, Award } from 'lucide-react';
+import { Crown, Medal, Trophy } from '@phosphor-icons/react';
+import { siteConfig } from '../data/siteConfig';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const prizeCards = [
-  {
-    title: 'Grand Prize',
-    description: 'Cash + credits + feature spotlight.',
-    icon: Crown,
-    rotation: -2,
-  },
-  {
-    title: 'Runner-Up',
-    description: 'Credits + mentorship session.',
-    icon: Medal,
-    rotation: 1,
-  },
-  {
-    title: 'Wildcard',
-    description: 'Most creative demo wins swag + tools.',
-    icon: Sparkles,
-    rotation: 4,
-  },
+const iconMap: Record<string, React.FC<{ className?: string; weight?: 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone' }>> = {
+  crown: Crown,
+  medal: Medal,
+  sparkles: Trophy,
+};
+
+const prizeStyles = [
+  { gradient: 'from-yellow-500/20 to-amber-500/10', icon: 'text-yellow-400' },
+  { gradient: 'from-slate-400/20 to-slate-500/10', icon: 'text-slate-300' },
+  { gradient: 'from-orange-600/20 to-amber-600/10', icon: 'text-orange-400' },
 ];
 
 export default function PrizesSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const portraitRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const noteCardRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const extrasRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
     const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=130%',
-          pin: true,
-          scrub: 0.6,
-        },
-      });
-
-      // ENTRANCE
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: '-60vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      scrollTl.fromTo(
+      gsap.fromTo(
         headlineRef.current,
-        { y: '-10vh', opacity: 0 },
-        { y: 0, opacity: 1, ease: 'none' },
-        0.05
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 70%',
+            toggleActions: 'play none none reverse',
+          },
+        }
       );
 
-      cardsRef.current.forEach((card, i) => {
-        if (!card) return;
-        const rotations = [-2, 1, 4];
-        
-        scrollTl.fromTo(
-          card,
-          { x: '50vw', rotate: rotations[i], opacity: 0 },
-          { x: 0, rotate: rotations[i], opacity: 1, ease: 'none' },
-          0.05 + 0.03 * i
+      const cards = cardsRef.current?.querySelectorAll('.prize-card');
+      if (cards) {
+        gsap.fromTo(
+          cards,
+          { y: 50, opacity: 0, scale: 0.95 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.12,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none reverse',
+            },
+          }
         );
-      });
+      }
 
-      scrollTl.fromTo(
-        noteCardRef.current,
-        { y: '20vh', scale: 0.96, opacity: 0 },
-        { y: 0, scale: 1, opacity: 1, ease: 'none' },
-        0.15
-      );
-
-      // EXIT
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: 0, opacity: 1 },
-        { x: '-18vw', opacity: 0.3, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        headlineRef.current,
-        { y: 0, opacity: 1 },
-        { y: '-6vh', opacity: 0.25, ease: 'power2.in' },
-        0.7
-      );
-
-      cardsRef.current.forEach((card) => {
-        if (!card) return;
-        scrollTl.fromTo(
-          card,
-          { x: 0, opacity: 1 },
-          { x: '14vw', opacity: 0.25, ease: 'power2.in' },
-          0.7
-        );
-      });
-
-      scrollTl.fromTo(
-        noteCardRef.current,
-        { y: 0, opacity: 1 },
-        { y: '10vh', opacity: 0.2, ease: 'power2.in' },
-        0.7
+      gsap.fromTo(
+        extrasRef.current,
+        { y: 30, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: extrasRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
       );
     }, section);
 
@@ -119,78 +88,66 @@ export default function PrizesSection() {
   }, []);
 
   return (
-    <div
+    <section
       ref={sectionRef}
       id="prizes"
-      className="section-pinned bg-neon-dark flex items-center"
+      className="relative py-24 lg:py-32 bg-background overflow-hidden"
     >
-      {/* Portrait */}
-      <div
-        ref={portraitRef}
-        className="absolute left-[7vw] top-[18vh] w-[40vw] h-[64vh] rounded-2xl overflow-hidden shadow-card"
-      >
-        <img
-          src="/prizes_portrait.jpg"
-          alt="Prizes"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-neon-dark/60 to-transparent" />
-      </div>
+      {/* Radial spotlight behind first prize */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-3xl" />
 
-      {/* Headline */}
-      <div
-        ref={headlineRef}
-        className="absolute left-[54vw] top-[18vh]"
-      >
-        <h2 className="headline-lg font-display text-neon-white">
-          <span className="text-neon-green">Prizes</span>
-        </h2>
-      </div>
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-12">
+        {/* Header */}
+        <div ref={headlineRef} className="text-center mb-16">
+          <span className="label-mono text-primary mb-4 block">What you can win</span>
+          <h2 className="headline-lg font-display text-foreground mb-2">
+            <span className="text-gradient">{siteConfig.prizes.headline}</span>
+          </h2>
+          <p className="text-lg text-primary font-display font-bold">
+            {siteConfig.prizes.totalPrizePool} in prizes
+          </p>
+        </div>
 
-      {/* Prize cards */}
-      {prizeCards.map((card, index) => {
-        const Icon = card.icon;
-        const positions = [
-          { left: '54vw', top: '32vh' },
-          { left: '56vw', top: '36vh' },
-          { left: '58vw', top: '40vh' },
-        ];
-        
-        return (
-          <div
-            key={card.title}
-            ref={(el) => { cardsRef.current[index] = el; }}
-            className="absolute w-[36vw] h-[22vh] rounded-2xl bg-card border border-white/5 shadow-card p-6 flex items-center gap-6"
-            style={{
-              left: positions[index].left,
-              top: positions[index].top,
-              transform: `rotate(${card.rotation}deg)`,
-              zIndex: 3 - index,
-            }}
-          >
-            <div className="w-14 h-14 rounded-xl bg-neon-green/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-7 h-7 text-neon-green" />
-            </div>
-            <div>
-              <h3 className="text-xl font-display font-bold text-neon-white">
-                {card.title}
-              </h3>
-              <p className="body-text text-sm mt-1">{card.description}</p>
-            </div>
-          </div>
-        );
-      })}
+        {/* Prize cards */}
+        <div
+          ref={cardsRef}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
+          {siteConfig.prizes.categories.map((prize, index) => {
+            const Icon = iconMap[prize.icon] || Trophy;
+            const style = prizeStyles[index] || prizeStyles[2];
+            const isFirst = index === 0;
 
-      {/* Note card */}
-      <div
-        ref={noteCardRef}
-        className="absolute left-[54vw] top-[70vh] w-[20vw] h-[14vh] rounded-2xl bg-neon-green/10 border border-neon-green/20 p-5 flex items-center gap-3"
-      >
-        <Award className="w-6 h-6 text-neon-green flex-shrink-0" />
-        <span className="text-sm text-neon-white">
-          Certificates for all participants
-        </span>
+            return (
+              <motion.div
+                key={prize.title}
+                className={`prize-card p-6 rounded-2xl glass-card-hover text-center ${isFirst ? 'md:scale-105 md:-translate-y-2' : ''
+                  }`}
+                whileHover={{ y: -8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${style.gradient} flex items-center justify-center mx-auto mb-4`}>
+                  <Icon className={`w-8 h-8 ${style.icon}`} weight="duotone" />
+                </div>
+                <h3 className="font-display font-bold text-xl text-foreground mb-1">
+                  {prize.title}
+                </h3>
+                <p className="text-2xl font-display font-bold text-primary mb-2">
+                  {prize.amount}
+                </p>
+                <p className="body-text text-sm">{prize.description}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Extras */}
+        <div ref={extrasRef} className="text-center mt-12">
+          <p className="text-sm text-muted-foreground">
+            Plus for all participants: {siteConfig.prizes.extras.join(' · ')}
+          </p>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,176 +1,119 @@
 import { useRef, useLayoutEffect } from 'react';
+import { motion } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Users, FileCheck } from 'lucide-react';
+import { CheckCircle, Warning } from '@phosphor-icons/react';
+import { siteConfig } from '../data/siteConfig';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const cards = [
-  { title: '2–4 members', icon: Users, rotation: -2 },
-  { title: 'Original work', icon: FileCheck, rotation: 3 },
-];
-
 export default function RulesSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const portraitRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLDivElement>(null);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const rulesRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
     const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=130%',
-          pin: true,
-          scrub: 0.6,
-        },
-      });
-
-      // ENTRANCE
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: '-60vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      scrollTl.fromTo(
-        headlineRef.current,
-        { x: '40vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0.05
-      );
-
-      scrollTl.fromTo(
-        bodyRef.current,
-        { x: '40vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0.1
-      );
-
-      cardsRef.current.forEach((card, i) => {
-        if (!card) return;
-        const startRotation = [-6, 6][i];
-        const endRotation = [-2, 3][i];
-        
-        scrollTl.fromTo(
-          card,
-          { y: '30vh', rotate: startRotation, opacity: 0 },
-          { y: 0, rotate: endRotation, opacity: 1, ease: 'none' },
-          0.12 + 0.03 * i
+      const rules = rulesRef.current?.querySelectorAll('.rule-item');
+      if (rules) {
+        gsap.fromTo(
+          rules,
+          { y: 30, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.08,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: rulesRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none reverse',
+            },
+          }
         );
-      });
-
-      // EXIT
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: 0, opacity: 1 },
-        { x: '-18vw', opacity: 0.3, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        headlineRef.current,
-        { x: 0, opacity: 1 },
-        { x: '12vw', opacity: 0.25, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        bodyRef.current,
-        { x: 0, opacity: 1 },
-        { x: '12vw', opacity: 0.25, ease: 'power2.in' },
-        0.72
-      );
-
-      cardsRef.current.forEach((card) => {
-        if (!card) return;
-        scrollTl.fromTo(
-          card,
-          { y: 0, opacity: 1 },
-          { y: '12vh', opacity: 0.25, ease: 'power2.in' },
-          0.7
-        );
-      });
+      }
     }, section);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <div
+    <section
       ref={sectionRef}
-      className="section-pinned bg-neon-dark flex items-center"
+      id="rules"
+      className="relative py-24 lg:py-32 bg-background overflow-hidden"
     >
-      {/* Portrait */}
+      {/* Subtle grid pattern */}
       <div
-        ref={portraitRef}
-        className="absolute left-[7vw] top-[18vh] w-[40vw] h-[64vh] rounded-2xl overflow-hidden shadow-card"
-      >
-        <img
-          src="/rules_portrait.jpg"
-          alt="Rules"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-neon-dark/60 to-transparent" />
-      </div>
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `linear-gradient(hsl(var(--primary)/0.3) 1px, transparent 1px),
+                           linear-gradient(90deg, hsl(var(--primary)/0.3) 1px, transparent 1px)`,
+          backgroundSize: '48px 48px',
+        }}
+      />
 
-      {/* Headline */}
-      <div
-        ref={headlineRef}
-        className="absolute left-[54vw] top-[22vh]"
-      >
-        <h2 className="headline-lg font-display text-neon-white">
-          <span className="text-neon-green">Rules</span>
-        </h2>
-      </div>
+      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-12">
+        {/* Header */}
+        <motion.div
+          className="text-center mb-12"
+          initial={{ y: 30, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <span className="label-mono text-primary mb-4 block">Guidelines</span>
+          <h2 className="headline-lg font-display text-foreground">
+            <span className="text-gradient">{siteConfig.rules.headline}</span>
+          </h2>
+        </motion.div>
 
-      {/* Body */}
-      <div
-        ref={bodyRef}
-        className="absolute left-[54vw] top-[38vh] max-w-[34vw]"
-      >
-        <p className="body-text">
-          Teams of 2–4. Code must be written during the event. Use open-source 
-          libraries freely. Be kind, be honest, and demo something real.
-        </p>
-      </div>
+        {/* Rules list */}
+        <div ref={rulesRef} className="space-y-4">
+          {siteConfig.rules.items.map((rule) => (
+            <motion.div
+              key={rule.title}
+              className="rule-item flex items-start gap-4 p-5 rounded-2xl glass-card-hover"
+              whileHover={{ x: 4 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <CheckCircle className="w-5 h-5 text-primary" weight="duotone" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-foreground mb-1">
+                  {rule.title}
+                </h3>
+                <p className="body-text text-sm">
+                  {rule.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
 
-      {/* Cards */}
-      {cards.map((card, index) => {
-        const Icon = card.icon;
-        const positions = [
-          { left: '54vw', top: '60vh' },
-          { left: '58vw', top: '64vh' },
-        ];
-        
-        return (
-          <div
-            key={card.title}
-            ref={(el) => { cardsRef.current[index] = el; }}
-            className="absolute w-[18vw] h-[20vh] rounded-2xl bg-card border border-white/5 shadow-card p-6 flex flex-col justify-between"
-            style={{
-              left: positions[index].left,
-              top: positions[index].top,
-              transform: `rotate(${card.rotation}deg)`,
-              zIndex: 2 - index,
-            }}
-          >
-            <div className="w-10 h-10 rounded-lg bg-neon-green/10 flex items-center justify-center">
-              <Icon className="w-5 h-5 text-neon-green" />
-            </div>
-            <h3 className="text-lg font-display font-bold text-neon-white">
-              {card.title}
-            </h3>
+        {/* Important note */}
+        <motion.div
+          className="mt-8 p-5 rounded-2xl bg-primary/5 border border-primary/20 flex items-start gap-4"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+        >
+          <Warning className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" weight="duotone" />
+          <div>
+            <p className="text-sm text-foreground font-medium mb-1">
+              Fair Play Policy
+            </p>
+            <p className="text-sm text-muted-foreground">
+              All participants must adhere to the code of conduct. Violation of rules may result in disqualification.
+            </p>
           </div>
-        );
-      })}
-    </div>
+        </motion.div>
+      </div>
+    </section>
   );
 }

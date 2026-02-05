@@ -1,180 +1,117 @@
 import { useRef, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Code, Palette, ArrowRight } from 'lucide-react';
+import { Code, PaintBrush, ArrowRight, GraduationCap, Laptop, Lightbulb } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
+import { siteConfig } from '../data/siteConfig';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const cards = [
-  { title: 'Developers', icon: Code, rotation: -2 },
-  { title: 'Designers', icon: Palette, rotation: 3 },
-];
-
 export default function WhoForSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const portraitRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const ctaRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
     const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
+      // Animate content on scroll
+      gsap.from('.who-content > *', {
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
         scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=130%',
-          pin: true,
-          scrub: 0.6,
+          trigger: containerRef.current,
+          start: 'top 70%',
+          toggleActions: 'play none none reverse',
         },
       });
 
-      // ENTRANCE
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: '-60vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      scrollTl.fromTo(
-        headlineRef.current,
-        { x: '40vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0.05
-      );
-
-      cardsRef.current.forEach((card, i) => {
-        if (!card) return;
-        const startRotation = [-4, 6][i];
-        const endRotation = [-2, 3][i];
-        
-        scrollTl.fromTo(
-          card,
-          { y: '30vh', rotate: startRotation, opacity: 0 },
-          { y: 0, rotate: endRotation, opacity: 1, ease: 'none' },
-          0.1 + 0.03 * i
-        );
+      // Animate cards
+      gsap.from('.who-card', {
+        x: 50,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 60%',
+          toggleActions: 'play none none reverse',
+        },
       });
-
-      scrollTl.fromTo(
-        ctaRef.current,
-        { y: '10vh', opacity: 0 },
-        { y: 0, opacity: 1, ease: 'none' },
-        0.15
-      );
-
-      // EXIT
-      scrollTl.fromTo(
-        portraitRef.current,
-        { x: 0, opacity: 1 },
-        { x: '-18vw', opacity: 0.3, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        headlineRef.current,
-        { x: 0, opacity: 1 },
-        { x: '12vw', opacity: 0.25, ease: 'power2.in' },
-        0.7
-      );
-
-      cardsRef.current.forEach((card) => {
-        if (!card) return;
-        scrollTl.fromTo(
-          card,
-          { y: 0, opacity: 1 },
-          { y: '12vh', opacity: 0.25, ease: 'power2.in' },
-          0.7
-        );
-      });
-
-      scrollTl.fromTo(
-        ctaRef.current,
-        { opacity: 1 },
-        { opacity: 0, ease: 'power2.in' },
-        0.85
-      );
-    }, section);
+    }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <div
+    <section
       ref={sectionRef}
-      className="section-pinned bg-neon-dark flex items-center"
+      className="relative py-24 lg:py-32 overflow-hidden"
     >
-      {/* Portrait */}
+      {/* Background Decor - Floating Blob */}
       <div
-        ref={portraitRef}
-        className="absolute left-[7vw] top-[18vh] w-[40vw] h-[64vh] rounded-2xl overflow-hidden shadow-card"
-      >
-        <img
-          src="/who_portrait.jpg"
-          alt="Who is this for"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-neon-dark/60 to-transparent" />
-      </div>
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] 
+                   bg-primary/5 rounded-full blur-[120px] -z-10"
+      />
 
-      {/* Headline */}
-      <div
-        ref={headlineRef}
-        className="absolute left-[54vw] top-[24vh] max-w-[38vw]"
-      >
-        <h2 className="headline-lg font-display text-neon-white">
-          Who is this <span className="text-neon-green">for?</span>
-        </h2>
-      </div>
+      <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-      {/* Cards */}
-      {cards.map((card, index) => {
-        const Icon = card.icon;
-        const positions = [
-          { left: '54vw', top: '48vh' },
-          { left: '58vw', top: '52vh' },
-        ];
-        
-        return (
-          <div
-            key={card.title}
-            ref={(el) => { cardsRef.current[index] = el; }}
-            className="absolute w-[18vw] h-[26vh] rounded-2xl bg-card border border-white/5 shadow-card p-6 flex flex-col justify-between"
-            style={{
-              left: positions[index].left,
-              top: positions[index].top,
-              transform: `rotate(${card.rotation}deg)`,
-              zIndex: 2 - index,
-            }}
-          >
-            <div className="w-10 h-10 rounded-lg bg-neon-green/10 flex items-center justify-center">
-              <Icon className="w-5 h-5 text-neon-green" />
+          {/* Left: Content */}
+          <div className="who-content space-y-8 order-last lg:order-first">
+            <div>
+              <span className="label-mono text-primary mb-4 block">Who is this for?</span>
+              <h2 className="headline-lg font-display text-foreground">
+                Built for <span className="text-gradient">Innovators</span> <br />
+                like you.
+              </h2>
             </div>
-            <h3 className="text-xl font-display font-bold text-neon-white">
-              {card.title}
-            </h3>
-          </div>
-        );
-      })}
 
-      {/* CTA */}
-      <div
-        ref={ctaRef}
-        className="absolute left-[54vw] top-[78vh]"
-      >
-        <Link 
-          to="/register" 
-          className="btn-secondary group"
-        >
-          See the rules
-          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </Link>
+            <p className="body-text text-lg max-w-lg">
+              Whether you're a coding wizard, a design enthusiast, or just have a great idea,
+              InnovatUp is the perfect platform to showcase your talent.
+            </p>
+
+            <Link
+              to="/register"
+              className="btn-primary inline-flex items-center group"
+            >
+              Start your journey
+              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" weight="bold" />
+            </Link>
+          </div>
+
+          {/* Right: Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative">
+            {siteConfig.whoFor.audiences.map((audience, index) => {
+              const icons = [GraduationCap, Code, Laptop, Lightbulb];
+              const Icon = icons[index % icons.length];
+
+              return (
+                <div
+                  key={audience.title}
+                  className={`who-card p-6 rounded-2xl bg-card border border-border/50 
+                              hover:border-primary/30 hover:bg-card/80 transition-all duration-300
+                              group shadow-sm hover:shadow-md
+                              ${index % 2 !== 0 ? 'lg:translate-y-12' : ''}`}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Icon className="w-6 h-6 text-primary" weight="duotone" />
+                  </div>
+                  <h3 className="text-xl font-display font-bold text-foreground mb-2">
+                    {audience.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {audience.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
