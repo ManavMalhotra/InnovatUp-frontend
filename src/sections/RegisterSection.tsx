@@ -95,7 +95,7 @@ export default function RegisterSection() {
           transition={{ delay: 0.4 }}
           className="text-sm text-muted-foreground mt-6"
         >
-          {siteConfig.registration.note}
+          Spots filling up fast! • Registration closes soon
         </motion.p>
       </div>
     </section>

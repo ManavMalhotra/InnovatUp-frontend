@@ -10,7 +10,7 @@ export default function MentorshipSection() {
   if (siteConfig.mentors.length === 0) {
     return (
       <section
-        id="mentors"
+        id="mentorship"
         className="relative py-16 bg-card/30"
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-12">
@@ -31,7 +31,7 @@ export default function MentorshipSection() {
   // Full mentors section when data is available
   return (
     <section
-      id="mentors"
+      id="mentorship"
       className="relative py-24 lg:py-32 bg-card/30"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-12">

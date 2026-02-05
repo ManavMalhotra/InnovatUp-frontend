@@ -1,162 +1,434 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, type Variants } from 'motion/react';
 import { List, X } from '@phosphor-icons/react';
 import AnimatedLogo from './AnimatedLogo';
 
-const navLinks = [
+// ═══════════════════════════════════════════════════════════════════
+// CONSTANTS & TYPES
+// ═══════════════════════════════════════════════════════════════════
+
+interface NavLink {
+  label: string;
+  href: string;
+}
+
+const NAV_LINKS: readonly NavLink[] = [
   { label: 'About', href: '#what-is' },
   { label: 'Timeline', href: '#timeline' },
   { label: 'Prizes', href: '#prizes' },
   { label: 'FAQs', href: '#faqs' },
-];
+] as const;
 
-export default function Navigation() {
+const SCROLL_THRESHOLD = 100;
+// const SCROLL_THROTTLE_MS = 16; // ~60fps
+
+// ═══════════════════════════════════════════════════════════════════
+// ANIMATION VARIANTS - Defined outside to prevent recreation
+// ═══════════════════════════════════════════════════════════════════
+
+const navVariants: Variants = {
+  hidden: { y: -100, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.6, ease: 'easeOut' }
+  },
+};
+
+const overlayVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
+const menuContentVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, delay: 0.1 }
+  },
+  exit: { opacity: 0, y: 20 },
+};
+
+const menuItemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.15 + index * 0.05 }
+  }),
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// CUSTOM HOOKS
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * Tracks scroll position with throttling for performance
+ */
+const useScrolled = (threshold = SCROLL_THRESHOLD): boolean => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
-  const isLandingPage = location.pathname === '/';
+  const ticking = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      if (!ticking.current) {
+        requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > threshold);
+          ticking.current = false;
+        });
+        ticking.current = true;
+      }
     };
+
+    // Check initial scroll position
+    setIsScrolled(window.scrollY > threshold);
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [threshold]);
 
+  return isScrolled;
+};
+
+/**
+ * Manages mobile menu state with body scroll lock
+ */
+const useMobileMenu = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  // Close menu on route change
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    setIsOpen(false);
   }, [location.pathname]);
 
+  // Handle body scroll lock and focus management
   useEffect(() => {
-    if (isMobileMenuOpen) {
+    if (isOpen) {
+      previousActiveElement.current = document.activeElement as HTMLElement;
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
+      // Restore focus when closing
+      previousActiveElement.current?.focus();
     }
+
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isMobileMenuOpen]);
+  }, [isOpen]);
 
-  const scrollToSection = (href: string) => {
+  // Close on escape key
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
+  const toggle = useCallback(() => setIsOpen(prev => !prev), []);
+  const close = useCallback(() => setIsOpen(false), []);
+
+  return { isOpen, toggle, close };
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// SUB-COMPONENTS
+// ═══════════════════════════════════════════════════════════════════
+
+interface NavLogoProps {
+  className?: string;
+}
+
+const NavLogo = memo<NavLogoProps>(({ className = '' }) => (
+  <Link
+    to="/"
+    className={`flex items-center gap-3 group ${className}`}
+    aria-label="InnovatUp - Go to homepage"
+  >
+    <div className="w-8 h-8 lg:w-10 lg:h-10 relative">
+      <AnimatedLogo size={40} animate={false} />
+    </div>
+    <span className="font-display font-bold text-lg lg:text-xl text-foreground tracking-tight">
+      Innovat<span className="text-primary">Up</span>
+    </span>
+  </Link>
+));
+NavLogo.displayName = 'NavLogo';
+
+// ─────────────────────────────────────────────────────────────────
+
+interface NavLinkButtonProps {
+  link: NavLink;
+  onClick: (href: string) => void;
+  variant?: 'desktop' | 'mobile';
+  index?: number;
+}
+
+const NavLinkButton = memo<NavLinkButtonProps>(({
+  link,
+  onClick,
+  variant = 'desktop',
+  index = 0
+}) => {
+  const handleClick = useCallback(() => {
+    onClick(link.href);
+  }, [onClick, link.href]);
+
+  if (variant === 'mobile') {
+    return (
+      <motion.button
+        onClick={handleClick}
+        className="text-2xl font-display font-bold text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg px-4 py-2"
+        variants={menuItemVariants}
+        custom={index}
+        initial="hidden"
+        animate="visible"
+      >
+        {link.label}
+      </motion.button>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      className="relative text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 group focus:outline-none focus-visible:text-foreground"
+    >
+      {link.label}
+      <span
+        className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-full group-focus-visible:w-full"
+        aria-hidden="true"
+      />
+    </button>
+  );
+});
+NavLinkButton.displayName = 'NavLinkButton';
+
+// ─────────────────────────────────────────────────────────────────
+
+interface DesktopNavProps {
+  isLandingPage: boolean;
+  onScrollToSection: (href: string) => void;
+}
+
+const DesktopNav = memo<DesktopNavProps>(({ isLandingPage, onScrollToSection }) => (
+  <div className="hidden lg:flex items-center gap-8">
+    {isLandingPage && NAV_LINKS.map((link) => (
+      <NavLinkButton
+        key={link.label}
+        link={link}
+        onClick={onScrollToSection}
+      />
+    ))}
+    <Link
+      to="/register"
+      className="btn-primary text-sm py-2.5 px-5"
+    >
+      Register Now
+    </Link>
+  </div>
+));
+DesktopNav.displayName = 'DesktopNav';
+
+// ─────────────────────────────────────────────────────────────────
+
+interface MobileMenuButtonProps {
+  isOpen: boolean;
+  onClick: () => void;
+}
+
+const MobileMenuButton = memo<MobileMenuButtonProps>(({ isOpen, onClick }) => (
+  <button
+    onClick={onClick}
+    className="lg:hidden p-2 text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+    aria-label={isOpen ? 'Close menu' : 'Open menu'}
+    aria-expanded={isOpen}
+    aria-controls="mobile-menu"
+  >
+    {isOpen ? (
+      <X size={24} weight="bold" aria-hidden="true" />
+    ) : (
+      <List size={24} weight="bold" aria-hidden="true" />
+    )}
+  </button>
+));
+MobileMenuButton.displayName = 'MobileMenuButton';
+
+// ─────────────────────────────────────────────────────────────────
+
+interface MobileMenuOverlayProps {
+  isOpen: boolean;
+  isLandingPage: boolean;
+  onClose: () => void;
+  onScrollToSection: (href: string) => void;
+}
+
+const MobileMenuOverlay = memo<MobileMenuOverlayProps>(({
+  isOpen,
+  isLandingPage,
+  onClose,
+  onScrollToSection
+}) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Focus first focusable element when menu opens
+  useEffect(() => {
+    if (isOpen && menuRef.current) {
+      const firstFocusable = menuRef.current.querySelector<HTMLElement>(
+        'button, a, [tabindex]:not([tabindex="-1"])'
+      );
+      firstFocusable?.focus();
+    }
+  }, [isOpen]);
+
+  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
+    // Only close if clicking the overlay itself, not its children
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  }, [onClose]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+          variants={overlayVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[999] bg-background/98 backdrop-blur-xl lg:hidden"
+          onClick={handleOverlayClick}
+        >
+          <motion.div
+            ref={menuRef}
+            className="flex flex-col items-center justify-center h-full gap-8 px-6"
+            variants={menuContentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {/* Close button for accessibility */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+              aria-label="Close menu"
+            >
+              <X size={24} weight="bold" aria-hidden="true" />
+            </button>
+
+            {/* Logo in mobile menu */}
+            <div className="mb-8">
+              <AnimatedLogo size={80} animate />
+            </div>
+
+            {/* Navigation links */}
+            <nav aria-label="Mobile navigation">
+              <ul className="flex flex-col items-center gap-6">
+                {isLandingPage && NAV_LINKS.map((link, index) => (
+                  <li key={link.label}>
+                    <NavLinkButton
+                      link={link}
+                      onClick={onScrollToSection}
+                      variant="mobile"
+                      index={index}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {/* Register CTA */}
+            <motion.div
+              variants={menuItemVariants}
+              custom={NAV_LINKS.length}
+              initial="hidden"
+              animate="visible"
+            >
+              <Link
+                to="/register"
+                onClick={onClose}
+                className="btn-primary text-lg mt-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+              >
+                Register Now
+              </Link>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+});
+MobileMenuOverlay.displayName = 'MobileMenuOverlay';
+
+// ═══════════════════════════════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════════════════════════════
+
+export default function Navigation() {
+  const location = useLocation();
+  const isScrolled = useScrolled();
+  const { isOpen, toggle, close } = useMobileMenu();
+
+  const isLandingPage = location.pathname === '/';
+
+  const scrollToSection = useCallback((href: string) => {
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-    setIsMobileMenuOpen(false);
-  };
+    close();
+  }, [close]);
+
+  // Memoize nav background classes
+  const navClassName = `fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${isScrolled
+    ? 'bg-background/90 backdrop-blur-lg border-b border-border/50 shadow-lg shadow-background/20'
+    : 'bg-transparent'
+    }`;
 
   return (
     <>
       <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className={`fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${isScrolled
-          ? 'bg-background/90 backdrop-blur-lg border-b border-border/50 shadow-lg shadow-background/20'
-          : 'bg-transparent'
-          }`}
+        variants={navVariants}
+        initial="hidden"
+        animate="visible"
+        className={navClassName}
+        role="navigation"
+        aria-label="Main navigation"
       >
         <div className="w-full px-4 sm:px-6 lg:px-12">
           <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-8 h-8 lg:w-10 lg:h-10 relative">
-                <AnimatedLogo size={40} animate={false} />
-              </div>
-              <span className="font-display font-bold text-lg lg:text-xl text-foreground tracking-tight">
-                Innovat<span className="text-primary">Up</span>
-              </span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-8">
-              {isLandingPage && navLinks.map((link) => (
-                <button
-                  key={link.label}
-                  onClick={() => scrollToSection(link.href)}
-                  className="relative text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 group"
-                >
-                  {link.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-full" />
-                </button>
-              ))}
-              <Link
-                to="/register"
-                className="btn-primary text-sm py-2.5 px-5"
-              >
-                Register Now
-              </Link>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-foreground hover:text-primary transition-colors"
-              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-            >
-              {isMobileMenuOpen ? <X size={24} weight="bold" /> : <List size={24} weight="bold" />}
-            </button>
+            <NavLogo />
+            <DesktopNav
+              isLandingPage={isLandingPage}
+              onScrollToSection={scrollToSection}
+            />
+            <MobileMenuButton isOpen={isOpen} onClick={toggle} />
           </div>
         </div>
       </motion.nav>
 
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[999] bg-background/98 backdrop-blur-xl lg:hidden cursor-pointer"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <motion.div
-              className="flex flex-col items-center justify-center h-full gap-8 px-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-            >
-              {/* Logo in mobile menu */}
-              <div className="mb-8">
-                <AnimatedLogo size={80} animate={true} />
-              </div>
-
-              {isLandingPage && navLinks.map((link, index) => (
-                <motion.button
-                  key={link.label}
-                  onClick={() => scrollToSection(link.href)}
-                  className="text-2xl font-display font-bold text-foreground hover:text-primary transition-colors"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 + index * 0.05 }}
-                >
-                  {link.label}
-                </motion.button>
-              ))}
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-              >
-                <Link
-                  to="/register"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="btn-primary text-lg mt-4"
-                >
-                  Register Now
-                </Link>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MobileMenuOverlay
+        isOpen={isOpen}
+        isLandingPage={isLandingPage}
+        onClose={close}
+        onScrollToSection={scrollToSection}
+      />
     </>
   );
 }
