@@ -157,8 +157,8 @@ export default function HeroSection() {
 
             {/* Countdown Timer */}
             <div className="hero-countdown mt-8">
-              <p className="label-mono text-muted-foreground mb-3">Event starts in</p>
-              <CountdownTimer />
+              {/* <p className="label-mono text-muted-foreground mb-3">Event starts in</p> */}
+              {/* <CountdownTimer /> */}
             </div>
 
             {/* CTA Buttons */}

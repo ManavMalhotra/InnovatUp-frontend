@@ -9,9 +9,9 @@ import Preloader from './components/Preloader';
 import HeroSection from './sections/HeroSection';
 
 import WhoForSection from './sections/WhoForSection';
-import TimelineSection from './sections/TimelineSection';
+// import TimelineSection from './sections/TimelineSection';
 import MentorshipSection from './sections/MentorshipSection';
-import PrizesSection from './sections/PrizesSection';
+// import PrizesSection from './sections/PrizesSection';
 import RulesSection from './sections/RulesSection';
 import FAQsSection from './sections/FAQsSection';
 import RegisterSection from './sections/RegisterSection';
@@ -63,9 +63,9 @@ function LandingPage() {
           <HeroSection />
 
           <WhoForSection />
-          <TimelineSection />
+          {/* <TimelineSection /> */}
           <MentorshipSection />
-          <PrizesSection />
+          {/* <PrizesSection /> */}
           <RulesSection />
           {/* Sponsors section removed as requested */}
           <FAQsSection />
