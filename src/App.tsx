@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -16,9 +16,10 @@ import RulesSection from './sections/RulesSection';
 import FAQsSection from './sections/FAQsSection';
 import RegisterSection from './sections/RegisterSection';
 import FooterSection from './sections/FooterSection';
-import RegistrationPage from './pages/RegistrationPage';
-import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
+// Lazy load pages
+const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 import { useDeviceCapability } from './hooks/useDeviceCapability';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -87,16 +88,25 @@ function ScrollToTop() {
   return null;
 }
 
+// Simple loading spinner for Suspense fallback
+const LoadingFallback = () => (
+  <div className="fixed inset-0 flex items-center justify-center bg-background z-50">
+    <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+  </div>
+);
+
 function App() {
   return (
     <Router>
       <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/register" element={<RegistrationPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-      </Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/register" element={<RegistrationPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

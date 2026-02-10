@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, CalendarBlank, CaretDown } from '@phosphor-icons/react';
 import AnimatedLogo from '../components/AnimatedLogo';
-import CountdownTimer from '../components/CountdownTimer';
+// import CountdownTimer from '../components/CountdownTimer';
 import { siteConfig } from '../data/siteConfig';
 
 gsap.registerPlugin(ScrollTrigger);

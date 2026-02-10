@@ -1,4 +1,5 @@
-import { useRef, useEffect, memo, useMemo, useCallback } from 'react';
+import { useRef, useEffect, memo, useMemo } from 'react';
+// import { useCallback } from 'react';
 import { motion, useInView, type Variants } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -94,11 +95,13 @@ const gridPatternStyle: React.CSSProperties = {
  * Custom hook for GSAP stagger animation with ScrollTrigger
  */
 const useStaggerAnimation = (
-  containerRef: React.RefObject<HTMLDivElement>,
+  containerRef: React.RefObject<HTMLDivElement | null>,
   itemSelector: string,
   config = ANIMATION_CONFIG
 ) => {
-  const animationRef = useRef<gsap.core.Context | null>(null);
+  // Fix: Context is likely exported directly on gsap or we can use generic cleanup type. 
+  // In modern GSAP types, it's often just gsap.Context
+  const animationRef = useRef<gsap.Context | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
