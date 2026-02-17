@@ -1,5 +1,3 @@
-import { useAuth } from "../context/AuthContext";
-
 import { useState, useEffect, useRef, Fragment } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -21,8 +19,6 @@ import axios from "axios";
 type LoginStep = "email" | "otp" | "success";
 
 export default function LoginPage() {
-  const { login } = useAuth();
-
   const navigate = useNavigate();
 
   // ═══════════════════════════════════════
@@ -207,12 +203,24 @@ export default function LoginPage() {
 
       switch (result) {
         case "otp-verified":
+        case "login-succes":
           // Store token if backend returns one
           if (response.data?.token) {
             localStorage.setItem("auth_token", response.data.token);
           }
           // Store email for dashboard use
           localStorage.setItem("user_email", email);
+          setStep("success");
+          setTimeout(() => navigate("/dashboard"), 2000);
+          break;
+
+        case "ok":
+          // Admin login — no token, users data comes in response
+          sessionStorage.setItem("is_admin", "true");
+          sessionStorage.setItem("admin_email", email);
+          if (response.data?.users) {
+            sessionStorage.setItem("admin_users", JSON.stringify(response.data.users));
+          }
           setStep("success");
           setTimeout(() => navigate("/dashboard"), 2000);
           break;
@@ -368,9 +376,8 @@ export default function LoginPage() {
             transition={{ duration: 0.3 }}
           />
           <motion.div
-            className={`flex-1 h-1 rounded-full transition-colors duration-300 ${
-              step === "otp" ? "bg-primary" : "bg-border"
-            }`}
+            className={`flex-1 h-1 rounded-full transition-colors duration-300 ${step === "otp" ? "bg-primary" : "bg-border"
+              }`}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.1 }}
@@ -387,18 +394,16 @@ export default function LoginPage() {
                 setError("");
               }
             }}
-            className={`label-mono text-xs transition-colors ${
-              step === "email"
-                ? "text-primary"
-                : "text-primary cursor-pointer hover:text-primary/80"
-            }`}
+            className={`label-mono text-xs transition-colors ${step === "email"
+              ? "text-primary"
+              : "text-primary cursor-pointer hover:text-primary/80"
+              }`}
           >
             Email
           </button>
           <span
-            className={`label-mono text-xs transition-colors ${
-              step === "otp" ? "text-primary" : "text-muted-foreground"
-            }`}
+            className={`label-mono text-xs transition-colors ${step === "otp" ? "text-primary" : "text-muted-foreground"
+              }`}
           >
             Verify
           </span>
@@ -589,10 +594,9 @@ export default function LoginPage() {
                         border-2 rounded-xl transition-all duration-200
                         bg-card text-foreground
                         focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
-                        ${
-                          digit
-                            ? "border-primary/50 bg-primary/5"
-                            : "border-border"
+                        ${digit
+                          ? "border-primary/50 bg-primary/5"
+                          : "border-border"
                         }
                         ${error ? "border-red-400/50" : ""}
                       `}

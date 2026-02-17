@@ -20,9 +20,9 @@ export const siteConfig = {
     // ==========================================
     dates: {
         registrationOpens: "2026-02-05T00:00:00+05:30",
-        registrationCloses: "2026-02-22T23:59:59+05:30",
-        eventStart: "2026-02-24T09:00:00+05:30",
-        eventEnd: "2026-02-26T18:00:00+05:30",
+        registrationCloses: "2026-03-22T23:59:59+05:30",
+        eventStart: "2026-03-24T09:00:00+05:30",
+        eventEnd: "2026-03-26T18:00:00+05:30",
         winnersAnnouncement: "2026-02-26T17:00:00+05:30",
     },
 
@@ -176,27 +176,43 @@ export const siteConfig = {
     // RULES
     // ==========================================
     rules: {
-        headline: "Rules",
+        headline: "Rules & Guidelines",
         items: [
             {
                 title: "Team Size",
-                description: "2-4 members per team. Solo? We'll help you find teammates.",
+                description: "2–5 members per team. No solo entries.",
             },
             {
-                title: "Original Work",
-                description: "All code must be written during the event. Boilerplates allowed.",
+                title: "Submit Your PPT",
+                description: "Send your idea deck before the deadline. Only shortlisted teams pitch at the event.",
             },
             {
-                title: "Any Tech Stack",
-                description: "Use any technology you prefer. We're stack-agnostic.",
+                title: "Screening",
+                description: "Judged on innovation, feasibility, theme relevance, and clarity. Clear the screen → you present.",
             },
             {
-                title: "Demo Required",
-                description: "All teams must present a working demo at the end.",
+                title: "Pitch Format",
+                description: "10–15 min presentation + 20 min Q&A with judges. Don't go over time.",
             },
             {
-                title: "Code of Conduct",
-                description: "Be respectful. No plagiarism. Have fun!",
+                title: "Prototype = Bonus",
+                description: "It's an ideathon, but a working demo gives you extra points.",
+            },
+            {
+                title: "What Judges Look For",
+                description: "Innovation, real-world impact, technical depth, and how well you present it.",
+            },
+            {
+                title: "Top 3 Finals",
+                description: "Top three teams after evaluation go into a final ranking round.",
+            },
+            {
+                title: "Judges Are Final",
+                description: "No appeals. No exceptions. Their call is the call.",
+            },
+            {
+                title: "Keep It Clean",
+                description: "No plagiarism, no misconduct. Break the rules = instant DQ.",
             },
         ],
     },
@@ -206,28 +222,32 @@ export const siteConfig = {
     // ==========================================
     faqs: [
         {
-            question: "Do I need to have a team?",
-            answer: "No! You can register as an individual and we'll help you find teammates during the team formation session on Day 0.",
+            question: "Do I need a team?",
+            answer: "Yes — 2 to 5 members required. No solo entries. Grab your squad and register together.",
         },
         {
-            question: "What should I bring?",
-            answer: "Your laptop, charger, and enthusiasm! We'll provide workspace and refreshments for on-campus participants.",
+            question: "What do I need to submit?",
+            answer: "An Idea Presentation (PPT) before the deadline. Shortlisted teams then pitch live at the event.",
         },
         {
-            question: "Is it online or offline?",
-            answer: "Hybrid! You can participate from campus or join remotely—your choice.",
+            question: "Where does it happen?",
+            answer: "College Auditorium. Shortlisted teams present in-person on event day.",
         },
         {
-            question: "What if I'm a beginner?",
-            answer: "Perfect! This is a learning experience. We have mentors to guide you and this is the best way to learn beyond curriculum.",
+            question: "I'm a total beginner — can I join?",
+            answer: "100%. You don't need to code. It's about ideas, not just tech. Mentors will guide you.",
         },
         {
-            question: "How are winners selected?",
-            answer: "Projects are judged on innovation, execution, design, and presentation by a panel of faculty and industry experts.",
+            question: "How are winners picked?",
+            answer: "Innovation, feasibility, social impact, technical clarity, and presentation skills. Top 3 go to finals.",
         },
         {
-            question: "Is registration free?",
-            answer: "Yes, participation is completely free for all BCIIT students.",
+            question: "Do I need a working prototype?",
+            answer: "Not required — it's an ideathon. But having one gives you bonus points with the judges.",
+        },
+        {
+            question: "Is it free?",
+            answer: "Yep, completely free for all BCIIT students.",
         },
     ],
 

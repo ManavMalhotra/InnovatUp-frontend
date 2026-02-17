@@ -1,22 +1,20 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { CircleNotch } from "@phosphor-icons/react";
+import { Navigate, Outlet } from 'react-router-dom';
+import { isTokenExpired } from '../lib/jwt';
 
+/**
+ * Protects routes that require authentication.
+ * Allows access if:
+ *   - A valid (non-expired) JWT exists in localStorage (regular users), OR
+ *   - An admin session exists in sessionStorage
+ * Otherwise redirects to /login.
+ */
 export default function ProtectedRoute() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const location = useLocation();
+    const hasToken = !isTokenExpired();
+    const isAdmin = sessionStorage.getItem('is_admin') === 'true';
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-background">
-        <CircleNotch className="w-10 h-10 animate-spin text-primary" />
-      </div>
-    );
-  }
+    if (!hasToken && !isAdmin) {
+        return <Navigate to="/login" replace />;
+    }
 
-  return isAuthenticated ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/" state={{ from: location }} replace />
-  );
+    return <Outlet />;
 }

@@ -6,6 +6,7 @@ import Navigation from './components/Navigation';
 import CustomCursor from './components/CustomCursor';
 import ScrollProgress from './components/ScrollProgress';
 import Preloader from './components/Preloader';
+import ProtectedRoute from './components/ProtectedRoute';
 import HeroSection from './sections/HeroSection';
 
 import WhoForSection from './sections/WhoForSection';
@@ -104,7 +105,9 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
         </Routes>
       </Suspense>
     </Router>

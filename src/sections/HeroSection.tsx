@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, CalendarBlank, CaretDown } from '@phosphor-icons/react';
 import AnimatedLogo from '../components/AnimatedLogo';
-// import CountdownTimer from '../components/CountdownTimer';
+import CountdownTimer from '@/components/CountdownTimer';
 import { siteConfig } from '../data/siteConfig';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -157,8 +157,8 @@ export default function HeroSection() {
 
             {/* Countdown Timer */}
             <div className="hero-countdown mt-8">
-              {/* <p className="label-mono text-muted-foreground mb-3">Event starts in</p> */}
-              {/* <CountdownTimer /> */}
+              <p className="label-mono text-muted-foreground mb-3">Event starts in</p>
+              <CountdownTimer />
             </div>
 
             {/* CTA Buttons */}
