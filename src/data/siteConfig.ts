@@ -180,39 +180,27 @@ export const siteConfig = {
         items: [
             {
                 title: "Team Size",
-                description: "2–5 members per team. No solo entries.",
+                description: "2–5 members. No solo entries.",
             },
             {
-                title: "Submit Your PPT",
-                description: "Send your idea deck before the deadline. Only shortlisted teams pitch at the event.",
-            },
-            {
-                title: "Screening",
-                description: "Judged on innovation, feasibility, theme relevance, and clarity. Clear the screen → you present.",
+                title: "Submit a PPT",
+                description: "Send your idea deck before the deadline. Shortlisted teams pitch live.",
             },
             {
                 title: "Pitch Format",
-                description: "10–15 min presentation + 20 min Q&A with judges. Don't go over time.",
+                description: "10–15 min presentation + 20 min Q&A. Don't go over time.",
             },
             {
                 title: "Prototype = Bonus",
-                description: "It's an ideathon, but a working demo gives you extra points.",
+                description: "Not required, but a working demo gets you extra points.",
             },
             {
-                title: "What Judges Look For",
-                description: "Innovation, real-world impact, technical depth, and how well you present it.",
+                title: "Judging Criteria",
+                description: "Innovation, real-world impact, technical depth, presentation. Top 3 go to finals.",
             },
             {
-                title: "Top 3 Finals",
-                description: "Top three teams after evaluation go into a final ranking round.",
-            },
-            {
-                title: "Judges Are Final",
-                description: "No appeals. No exceptions. Their call is the call.",
-            },
-            {
-                title: "Keep It Clean",
-                description: "No plagiarism, no misconduct. Break the rules = instant DQ.",
+                title: "Fair Play",
+                description: "No plagiarism, no misconduct. Judges' decisions are final.",
             },
         ],
     },
@@ -223,31 +211,27 @@ export const siteConfig = {
     faqs: [
         {
             question: "Do I need a team?",
-            answer: "Yes — 2 to 5 members required. No solo entries. Grab your squad and register together.",
+            answer: "Yes — 2 to 5 members. No solo entries.",
         },
         {
-            question: "What do I need to submit?",
-            answer: "An Idea Presentation (PPT) before the deadline. Shortlisted teams then pitch live at the event.",
+            question: "What do I submit?",
+            answer: "A PPT with your idea. Shortlisted teams pitch live on event day.",
         },
         {
-            question: "Where does it happen?",
-            answer: "College Auditorium. Shortlisted teams present in-person on event day.",
-        },
-        {
-            question: "I'm a total beginner — can I join?",
-            answer: "100%. You don't need to code. It's about ideas, not just tech. Mentors will guide you.",
-        },
-        {
-            question: "How are winners picked?",
-            answer: "Innovation, feasibility, social impact, technical clarity, and presentation skills. Top 3 go to finals.",
-        },
-        {
-            question: "Do I need a working prototype?",
-            answer: "Not required — it's an ideathon. But having one gives you bonus points with the judges.",
+            question: "Do I need to code?",
+            answer: "Nope. It's an ideathon — ideas first. A prototype is a bonus, not a requirement.",
         },
         {
             question: "Is it free?",
-            answer: "Yep, completely free for all BCIIT students.",
+            answer: "Yes — completely free for all students. Zero fees.",
+        },
+        {
+            question: "How are winners picked?",
+            answer: "Innovation, impact, technical depth, and presentation. Top 3 go to a final round.",
+        },
+        {
+            question: "I'm a beginner — can I join?",
+            answer: "Absolutely. Mentors will help you out. Just bring an idea.",
         },
     ],
 

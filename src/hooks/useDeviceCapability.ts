@@ -106,7 +106,7 @@ export function useDeviceCapability(): DeviceCapability {
         };
 
         mediaQuery.addEventListener('change', handleChange);
-        console.log(capability)
+
         return () => mediaQuery.removeEventListener('change', handleChange);
 
 

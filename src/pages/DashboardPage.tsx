@@ -20,6 +20,7 @@ import {
 } from '@phosphor-icons/react';
 import AnimatedLogo from '../components/AnimatedLogo';
 import { clearAuth, isAdmin as checkIsAdmin, type User } from '../lib/jwt';
+import type { AdminUser, TeamMember } from '../types/auth';
 import api from '../lib/api';
 import * as XLSX from 'xlsx';
 
@@ -38,7 +39,7 @@ export default function DashboardPage() {
 
   // Admin state
   const [isAdmin, setIsAdmin] = useState(false);
-  const [adminUsers, setAdminUsers] = useState<any[]>([]);
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   const [isLoading, setIsLoading] = useState(true);
@@ -103,7 +104,7 @@ export default function DashboardPage() {
   //  Excel Export
   // ═══════════════════════════════════════
   const handleExportExcel = () => {
-    const exportData = filteredUsers.map((u: any, index: number) => ({
+    const exportData = filteredUsers.map((u, index) => ({
       'S.No': index + 1,
       'Name': u.username || u.name || '',
       'Email': u.email || '',
@@ -113,7 +114,7 @@ export default function DashboardPage() {
       'Team Count': u.team_count || 1,
       'Team Members': u.team_members
         ? (Array.isArray(u.team_members)
-          ? u.team_members.map((m: any) => `${m.name} (${m.email})`).join(', ')
+          ? u.team_members.map((m: TeamMember) => `${m.name} (${m.email})`).join(', ')
           : u.team_members)
         : '',
       'Topic / Idea': u.topic || u.idea_desc || '',
@@ -128,7 +129,7 @@ export default function DashboardPage() {
       const colWidths = Object.keys(exportData[0]).map(key => ({
         wch: Math.max(
           key.length,
-          ...exportData.map(row => String((row as any)[key] || '').length)
+          ...exportData.map(row => String(row[key as keyof typeof row] || '').length)
         ) + 2
       }));
       worksheet['!cols'] = colWidths;
@@ -140,7 +141,7 @@ export default function DashboardPage() {
   // ═══════════════════════════════════════
   //  Filtered users for admin search
   // ═══════════════════════════════════════
-  const filteredUsers = adminUsers.filter((u: any) => {
+  const filteredUsers = adminUsers.filter((u) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -326,7 +327,7 @@ export default function DashboardPage() {
                           </td>
                         </tr>
                       ) : (
-                        filteredUsers.map((u: any, index: number) => (
+                        filteredUsers.map((u, index) => (
                           <tr key={u._id || index} className="transition-colors hover:bg-muted/20">
                             <td className="px-6 py-4 text-muted-foreground">{index + 1}</td>
                             <td className="px-6 py-4 font-medium text-foreground">{u.username || u.name || '-'}</td>

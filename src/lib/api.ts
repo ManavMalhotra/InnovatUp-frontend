@@ -1,10 +1,8 @@
 import axios from "axios";
+import { clearAuth } from "./jwt";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, ""),
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // Request Interceptor: Add Token
@@ -24,9 +22,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("user_email");
-      window.location.href = "/"; // Force redirect to login
+      clearAuth();
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   },

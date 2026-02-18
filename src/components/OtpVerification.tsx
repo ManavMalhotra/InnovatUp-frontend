@@ -5,7 +5,6 @@ import {
     ArrowClockwise,
     CircleNotch,
     ShieldCheck,
-    EnvelopeOpen,
 } from '@phosphor-icons/react';
 import type { UseOtpReturn } from '../hooks/useOtp';
 
@@ -65,31 +64,23 @@ export default function OtpVerification({
 
     return (
         <motion.div
-            className="space-y-8"
+            className="space-y-6"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.3 }}
         >
-            {/* Icon & Title */}
+            {/* Title */}
             <div className="text-center">
-                <motion.div
-                    className="flex items-center justify-center w-16 h-16 mx-auto mb-5 rounded-full bg-primary/10"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', delay: 0.1 }}
-                >
-                    <EnvelopeOpen weight="duotone" className="w-8 h-8 text-primary" />
-                </motion.div>
                 <h2 className="mb-2 text-xl font-bold font-display text-foreground">
                     {title}
                 </h2>
                 <p className="text-sm text-muted-foreground">{subtitle}</p>
-                <p className="mt-1 text-sm font-medium text-foreground">{maskedEmail}</p>
+                <p className="mt-1 text-sm font-medium truncate text-foreground">{maskedEmail}</p>
             </div>
 
             {/* OTP Input Boxes */}
-            <div className="flex items-center justify-center gap-2 sm:gap-3">
+            <div className="flex items-center justify-center gap-1.5 sm:gap-3">
                 {otp.map((digit, index) => (
                     <Fragment key={index}>
                         {index === 3 && (
@@ -117,7 +108,7 @@ export default function OtpVerification({
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
                             className={`
-                w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold font-display
+                w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold font-display
                 border-2 rounded-xl transition-all duration-200
                 bg-card text-foreground
                 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
@@ -131,13 +122,13 @@ export default function OtpVerification({
 
             {/* Error Message */}
             {otpError && (
-                <motion.p
+                <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-center text-red-400"
+                    className="p-3 text-sm text-center text-red-400 border rounded-lg bg-red-500/5 border-red-500/20"
                 >
                     {otpError}
-                </motion.p>
+                </motion.div>
             )}
 
             {/* Resend Timer / Button */}
@@ -168,7 +159,7 @@ export default function OtpVerification({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex gap-3">
                 <button type="button" onClick={onBack} className="flex-1 btn-secondary">
                     <span className="flex items-center justify-center gap-2">
                         <ArrowLeft className="w-4 h-4" />

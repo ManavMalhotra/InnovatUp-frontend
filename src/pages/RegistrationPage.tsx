@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import {
-  ArrowLeft,
   User,
   EnvelopeSimple,
   Phone,
@@ -17,6 +16,7 @@ import {
 import AnimatedLogo from "../components/AnimatedLogo";
 import OtpVerification from "../components/OtpVerification";
 import { useOtp, maskEmail } from "../hooks/useOtp";
+import api from "../lib/api";
 import axios from "axios";
 
 interface TeamMember {
@@ -56,6 +56,7 @@ export default function RegistrationPage() {
   ]);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   // ═══════════════════════════════════════
   //  OTP Verification State
@@ -94,12 +95,10 @@ export default function RegistrationPage() {
     otpState.setOtpError("");
 
     try {
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-
       const otpFormData = new FormData();
       otpFormData.append("email", formData.email);
 
-      await axios.post(`${baseURL?.replace(/\/$/, "")}/send-otp`, otpFormData);
+      await api.post("/send-otp", otpFormData);
 
       setShowOtpStep(true);
       otpState.startResendTimer();
@@ -107,9 +106,15 @@ export default function RegistrationPage() {
       otpState.focusFirstInput(300);
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        const detail = error.response?.data?.detail;
+        const msg =
+          typeof detail === "string"
+            ? detail
+            : Array.isArray(detail)
+              ? detail.map((d: { msg?: string }) => d.msg).join(", ")
+              : null;
         otpState.setOtpError(
-          error.response?.data?.detail ||
-          "Failed to send OTP. Please try again.",
+          msg || "Failed to send OTP. Please try again.",
         );
       } else {
         otpState.setOtpError("Something went wrong. Please try again.");
@@ -132,16 +137,11 @@ export default function RegistrationPage() {
     otpState.setOtpError("");
 
     try {
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-
       const verifyFormData = new FormData();
       verifyFormData.append("email", formData.email);
       verifyFormData.append("otp", otpState.otpString);
 
-      const response = await axios.post(
-        `${baseURL?.replace(/\/$/, "")}/verify-otp`,
-        verifyFormData,
-      );
+      const response = await api.post("/verify-otp", verifyFormData);
 
       const result = response.data?.result;
 
@@ -175,6 +175,12 @@ export default function RegistrationPage() {
       if (axios.isAxiosError(error)) {
         const result = error.response?.data?.result;
         const detail = error.response?.data?.detail;
+        const detailMsg =
+          typeof detail === "string"
+            ? detail
+            : Array.isArray(detail)
+              ? detail.map((d: { msg?: string }) => d.msg).join(", ")
+              : null;
 
         if (result === "otp-not-verified") {
           otpState.setOtpError("Incorrect OTP. Please check and try again.");
@@ -183,7 +189,7 @@ export default function RegistrationPage() {
         } else if (result === "server-error") {
           otpState.setOtpError("Server error. Please try again later.");
         } else {
-          otpState.setOtpError(detail || "Verification failed. Please try again.");
+          otpState.setOtpError(detailMsg || "Verification failed. Please try again.");
         }
 
         otpState.resetOtp();
@@ -228,10 +234,12 @@ export default function RegistrationPage() {
     e.preventDefault();
 
     if (!emailVerified) {
-      alert("Please verify your email before submitting.");
+      setSubmitError("Please verify your email before submitting.");
       setStep(1);
       return;
     }
+
+    setSubmitError("");
 
     const formDataToSend = new FormData();
     formDataToSend.append("leaderName", formData.leaderName);
@@ -251,9 +259,7 @@ export default function RegistrationPage() {
     formDataToSend.append("team_members", JSON.stringify(cleanTeamMembers));
 
     try {
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const endpoint = `${baseURL?.replace(/\/$/, "")}/reg`;
-      const response = await axios.post(endpoint, formDataToSend);
+      const response = await api.post("/reg", formDataToSend);
 
       if (response.status === 200 || response.status === 201) {
         setIsSubmitted(true);
@@ -263,13 +269,18 @@ export default function RegistrationPage() {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("Server Error Response:", error.response?.data);
-        alert(
-          `Registration failed: ${error.response?.data?.detail || "Check inputs"
-          }`,
+        const detail = error.response?.data?.detail;
+        const msg =
+          typeof detail === "string"
+            ? detail
+            : Array.isArray(detail)
+              ? detail.map((d: { msg?: string }) => d.msg).join(", ")
+              : null;
+        setSubmitError(
+          `Registration failed: ${msg || "Please check your inputs and try again."}`,
         );
       } else {
-        console.error("Unexpected Error:", error);
+        setSubmitError("Something went wrong. Please try again.");
       }
     }
   };
@@ -294,7 +305,7 @@ export default function RegistrationPage() {
           >
             <Check className="w-10 h-10 text-primary" />
           </motion.div>
-          <h2 className="mb-4 headline-lg font-display text-foreground">
+          <h2 className="mb-4 text-2xl font-bold font-display text-foreground">
             Registration Complete!
           </h2>
           <p className="body-text">Redirecting to your dashboard...</p>
@@ -312,491 +323,468 @@ export default function RegistrationPage() {
   //  Main Render
   // ═══════════════════════════════════════
   return (
-    <div className="min-h-screen px-6 py-4 pb-20 bg-background">
+    <div className="min-h-screen px-6 py-8 pb-20 bg-background">
       <div className="max-w-2xl mx-auto">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 mb-6">
+        <Link to="/" className="inline-flex items-center gap-3 mb-8">
           <AnimatedLogo size={40} animate={false} />
           <span className="text-xl font-bold font-display text-foreground">
             Innovat<span className="text-primary">Up</span>
           </span>
         </Link>
 
-        {/* Back button */}
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 mb-8 transition-colors text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to home
-        </Link>
+        {/* Glass Card */}
+        <div className="p-6 border bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl sm:p-8">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="mb-2 text-2xl font-bold font-display text-foreground">
+              Register for <span className="text-gradient">InnovatUp</span>
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Fill in your details to secure your spot in the ideathon.
+            </p>
+          </div>
 
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="mb-3 headline-lg font-display text-foreground">
-            Register for <span className="text-gradient">InnovatUp</span>
-          </h1>
-          <p className="body-text">
-            Fill in your details to secure your spot in the ideathon.
-          </p>
-        </div>
+          {/* Progress Bar */}
+          <div className="flex gap-2 mb-8">
+            {[1, 2, 3].map((s) => (
+              <motion.div
+                key={s}
+                className={`h-1 flex-1 rounded-full transition-colors ${s <= step ? "bg-primary" : "bg-border"
+                  }`}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: s * 0.1 }}
+              />
+            ))}
+          </div>
 
-        {/* Progress Bar */}
-        <div className="flex gap-2 mb-10">
-          {[1, 2, 3].map((s) => (
-            <motion.div
-              key={s}
-              className={`h-1 flex-1 rounded-full transition-colors ${s <= step ? "bg-primary" : "bg-border"
-                }`}
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: s * 0.1 }}
-            />
-          ))}
-        </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* ╔═══════════════════════════════╗ */}
+            {/* ║  STEP 1 — Leader Details      ║ */}
+            {/* ╚═══════════════════════════════╝ */}
+            {step === 1 && !showOtpStep && (
+              <motion.div
+                className="space-y-6"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="mb-6 text-xl font-bold font-display text-foreground">
+                  Team Leader Details
+                </h2>
 
-        {/* Progress Labels */}
-        <div className="flex justify-between mb-8">
-          {["Leader", "Team", "Idea"].map((label, i) => (
-            <button
-              key={label}
-              disabled={i + 1 > step}
-              onClick={() => {
-                // Prevent going past step 1 if email not verified
-                if (i + 1 > 1 && !emailVerified) return;
-                setStep(i + 1);
-                setShowOtpStep(false);
-              }}
-              className={`label-mono text-xs transition-colors ${i + 1 <= step
-                ? "text-primary cursor-pointer hover:text-primary/80"
-                : "text-muted-foreground cursor-default"
-                }`}
-            >
-              {label}
-              {label === "Leader" && emailVerified && (
-                <ShieldCheck
-                  weight="fill"
-                  className="inline-block w-3 h-3 ml-1 text-green-500"
-                />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ╔═══════════════════════════════╗ */}
-          {/* ║  STEP 1 — Leader Details      ║ */}
-          {/* ╚═══════════════════════════════╝ */}
-          {step === 1 && !showOtpStep && (
-            <motion.div
-              className="space-y-6"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 className="mb-6 text-xl font-bold font-display text-foreground">
-                Team Leader Details
-              </h2>
-
-              {/* Full Name */}
-              <div>
-                <label className="block mb-2 label-mono text-muted-foreground">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
-                  <input
-                    type="text"
-                    required
-                    value={formData.leaderName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, leaderName: e.target.value })
-                    }
-                    className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                    placeholder="John Doe"
-                  />
-                </div>
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block mb-2 label-mono text-muted-foreground">
-                  Email ID
-                </label>
-                <div className="relative">
-                  <EnvelopeSimple
-                    className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground"
-                    weight="duotone"
-                  />
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => {
-                      setFormData({ ...formData, email: e.target.value });
-                      if (emailVerified) {
-                        setEmailVerified(false);
+                {/* Full Name */}
+                <div>
+                  <label className="block mb-2 label-mono text-muted-foreground">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <User className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                    <input
+                      type="text"
+                      required
+                      value={formData.leaderName}
+                      onChange={(e) =>
+                        setFormData({ ...formData, leaderName: e.target.value })
                       }
-                    }}
-                    className={`w-full py-4 pl-12 pr-12 transition-all border bg-card rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary ${emailVerified ? "border-green-500/50" : "border-border"
-                      }`}
-                    placeholder="you@college.edu"
-                  />
+                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block mb-2 label-mono text-muted-foreground">
+                    Email ID
+                  </label>
+                  <div className="relative">
+                    <EnvelopeSimple
+                      className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground"
+                      weight="duotone"
+                    />
+                    <input
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => {
+                        setFormData({ ...formData, email: e.target.value });
+                        if (emailVerified) {
+                          setEmailVerified(false);
+                        }
+                      }}
+                      className={`w-full py-4 pl-12 pr-12 transition-all border bg-card rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary ${emailVerified ? "border-green-500/50" : "border-border"
+                        }`}
+                      placeholder="you@college.edu"
+                    />
+                    {emailVerified && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -translate-y-1/2 right-4 top-1/2"
+                      >
+                        <ShieldCheck
+                          weight="fill"
+                          className="w-5 h-5 text-green-500"
+                        />
+                      </motion.div>
+                    )}
+                  </div>
                   {emailVerified && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -translate-y-1/2 right-4 top-1/2"
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-1 mt-1.5 text-xs text-green-500"
                     >
-                      <ShieldCheck
-                        weight="fill"
-                        className="w-5 h-5 text-green-500"
-                      />
-                    </motion.div>
+                      <Check weight="bold" className="w-3 h-3" />
+                      Email verified
+                    </motion.p>
                   )}
                 </div>
-                {emailVerified && (
-                  <motion.p
+
+                {/* Mobile */}
+                <div>
+                  <label className="block mb-2 label-mono text-muted-foreground">
+                    Mobile Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                    <input
+                      type="tel"
+                      required
+                      value={formData.mobile}
+                      onChange={(e) =>
+                        setFormData({ ...formData, mobile: e.target.value })
+                      }
+                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      placeholder="+91 98765 43210"
+                    />
+                  </div>
+                </div>
+
+                {/* Error from OTP sending */}
+                {otpState.otpError && !showOtpStep && (
+                  <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-1 mt-1.5 text-xs text-green-500"
+                    className="p-3 text-sm text-center text-red-400 border rounded-lg bg-red-500/5 border-red-500/20"
                   >
-                    <Check weight="bold" className="w-3 h-3" />
-                    Email verified
-                  </motion.p>
+                    {otpState.otpError}
+                  </motion.div>
                 )}
-              </div>
 
-              {/* Mobile */}
-              <div>
-                <label className="block mb-2 label-mono text-muted-foreground">
-                  Mobile Number
-                </label>
-                <div className="relative">
-                  <Phone className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
-                  <input
-                    type="tel"
-                    required
-                    value={formData.mobile}
-                    onChange={(e) =>
-                      setFormData({ ...formData, mobile: e.target.value })
-                    }
-                    className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                    placeholder="+91 98765 43210"
-                  />
-                </div>
-              </div>
-
-              {/* Error from OTP sending */}
-              {otpState.otpError && !showOtpStep && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-center text-red-400"
-                >
-                  {otpState.otpError}
-                </motion.p>
-              )}
-
-              {/* Continue / Verify Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (emailVerified) {
-                    setStep(2);
-                  } else {
-                    handleSendOtp();
-                  }
-                }}
-                disabled={sendingOtp}
-                className="w-full btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {sendingOtp ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <CircleNotch className="w-5 h-5 animate-spin" />
-                    Sending OTP...
-                  </span>
-                ) : emailVerified ? (
-                  <span className="flex items-center justify-center gap-2">
-                    Continue
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <ShieldCheck className="w-5 h-5" />
-                    Verify Email & Continue
-                  </span>
-                )}
-              </button>
-            </motion.div>
-          )}
-
-          {/* ╔═══════════════════════════════╗ */}
-          {/* ║  STEP 1.5 — OTP Verification  ║ */}
-          {/* ╚═══════════════════════════════╝ */}
-          {step === 1 && showOtpStep && (
-            <OtpVerification
-              otpState={otpState}
-              maskedEmail={maskedEmail}
-              verifying={verifyingOtp}
-              sendingOtp={sendingOtp}
-              onVerify={handleVerifyOtp}
-              onBack={() => {
-                setShowOtpStep(false);
-                otpState.resetOtp();
-              }}
-              onResend={handleResendOtp}
-              backLabel="Change Email"
-              verifyLabel="Verify & Continue"
-              title="Verify Your Email"
-              subtitle="We've sent a 6-digit verification code to"
-            />
-          )}
-
-          {/* ╔═══════════════════════════════╗ */}
-          {/* ║  STEP 2 — Team Information    ║ */}
-          {/* ╚═══════════════════════════════╝ */}
-          {step === 2 && (
-            <motion.div
-              className="space-y-6"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 className="mb-6 text-xl font-bold font-display text-foreground">
-                Team Information
-              </h2>
-
-              {/* Team Name */}
-              <div>
-                <label className="block mb-2 label-mono text-muted-foreground">
-                  Team Name
-                </label>
-                <div className="relative">
-                  <Users className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
-                  <input
-                    type="text"
-                    required
-                    value={formData.teamName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, teamName: e.target.value })
-                    }
-                    className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                    placeholder="Team Innovators"
-                  />
-                </div>
-              </div>
-
-              {/* Team Size */}
-              <div>
-                <label className="block mb-3 label-mono text-muted-foreground">
-                  Number of Team Members
-                </label>
-                <div className="grid grid-cols-3 gap-4">
-                  {[2, 3, 4, 5].map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => handleTeamSizeChange(size.toString())}
-                      className={`
-                        py-4 rounded-xl border transition-all duration-200
-                        flex flex-col items-center justify-center gap-2
-                        ${Number(formData.teamSize) === size
-                          ? "bg-primary/10 border-primary text-primary shadow-[0_0_20px_rgba(59,130,246,0.15)]"
-                          : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-card/80"
-                        }
-                      `}
-                    >
-                      <Users
-                        weight={
-                          Number(formData.teamSize) === size
-                            ? "duotone"
-                            : "regular"
-                        }
-                        className="w-6 h-6"
-                      />
-                      <span className="text-lg font-bold font-display">
-                        {size} Members
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Team Members */}
-              {teamMembers.map((member, index) => (
-                <motion.div
-                  key={index}
-                  className="p-4 border rounded-xl bg-card/50 border-border"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <h4 className="mb-3 text-sm font-medium text-muted-foreground">
-                    Team Member {index + 2}
-                  </h4>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Full Name"
-                        value={member.name}
-                        onChange={(e) => {
-                          const newMembers = [...teamMembers];
-                          newMembers[index].name = e.target.value;
-                          setTeamMembers(newMembers);
-                        }}
-                        className="w-full px-4 py-3 transition-all border bg-background border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                      />
-                    </div>
-                    <div className="relative">
-                      <input
-                        type="email"
-                        placeholder="Email Address"
-                        value={member.email}
-                        onChange={(e) => {
-                          const newMembers = [...teamMembers];
-                          newMembers[index].email = e.target.value;
-                          setTeamMembers(newMembers);
-                        }}
-                        className="w-full px-4 py-3 transition-all border bg-background border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                      />
-                    </div>
-                    <div className="relative">
-                      <Phone className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
-                      <input
-                        type="tel"
-                        required
-                        value={member.mobile}
-                        onChange={(e) => {
-                          const newMembers = [...teamMembers];
-                          newMembers[index].mobile = e.target.value;
-                          setTeamMembers(newMembers);
-                        }}
-                        className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                        placeholder="+91 98765 43210"
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-
-              <div className="flex gap-4">
+                {/* Continue / Verify Button */}
                 <button
                   type="button"
                   onClick={() => {
-                    setStep(1);
-                    setShowOtpStep(false);
+                    if (emailVerified) {
+                      setStep(2);
+                    } else {
+                      handleSendOtp();
+                    }
                   }}
-                  className="flex-1 btn-secondary"
+                  disabled={sendingOtp}
+                  className="w-full btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Back
+                  {sendingOtp ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <CircleNotch className="w-5 h-5 animate-spin" />
+                      Sending OTP...
+                    </span>
+                  ) : emailVerified ? (
+                    <span className="flex items-center justify-center gap-2">
+                      Continue
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      <ShieldCheck className="w-5 h-5" />
+                      Verify Email & Continue
+                    </span>
+                  )}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setStep(3)}
-                  className="flex-1 btn-primary"
-                >
-                  Continue
-                </button>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
 
-          {/* ╔═══════════════════════════════╗ */}
-          {/* ║  STEP 3 — Idea Details        ║ */}
-          {/* ╚═══════════════════════════════╝ */}
-          {step === 3 && (
-            <motion.div
-              className="space-y-6"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 className="mb-6 text-xl font-bold font-display text-foreground">
-                Idea Details
-              </h2>
+            {/* ╔═══════════════════════════════╗ */}
+            {/* ║  STEP 1.5 — OTP Verification  ║ */}
+            {/* ╚═══════════════════════════════╝ */}
+            {step === 1 && showOtpStep && (
+              <OtpVerification
+                otpState={otpState}
+                maskedEmail={maskedEmail}
+                verifying={verifyingOtp}
+                sendingOtp={sendingOtp}
+                onVerify={handleVerifyOtp}
+                onBack={() => {
+                  setShowOtpStep(false);
+                  otpState.resetOtp();
+                }}
+                onResend={handleResendOtp}
+                backLabel="Change Email"
+                verifyLabel="Verify & Continue"
+                title="Verify Your Email"
+                subtitle="We've sent a 6-digit verification code to"
+              />
+            )}
 
-              <div>
-                <label className="block mb-2 label-mono text-muted-foreground">
-                  Topic/Theme
-                </label>
-                <div className="relative">
-                  <Lightbulb className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
-                  <input
-                    type="text"
-                    required
-                    value={formData.topic}
-                    onChange={(e) =>
-                      setFormData({ ...formData, topic: e.target.value })
-                    }
-                    className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                    placeholder="AI for Healthcare"
-                  />
+            {/* ╔═══════════════════════════════╗ */}
+            {/* ║  STEP 2 — Team Information    ║ */}
+            {/* ╚═══════════════════════════════╝ */}
+            {step === 2 && (
+              <motion.div
+                className="space-y-6"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="mb-6 text-xl font-bold font-display text-foreground">
+                  Team Information
+                </h2>
+
+                {/* Team Name */}
+                <div>
+                  <label className="block mb-2 label-mono text-muted-foreground">
+                    Team Name
+                  </label>
+                  <div className="relative">
+                    <Users className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                    <input
+                      type="text"
+                      required
+                      value={formData.teamName}
+                      onChange={(e) =>
+                        setFormData({ ...formData, teamName: e.target.value })
+                      }
+                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      placeholder="Team Innovators"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block mb-2 label-mono text-muted-foreground">
-                  Institute/College
-                </label>
-                <div className="relative">
-                  <Buildings
-                    className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground"
-                    weight="duotone"
-                  />
-                  <input
-                    type="text"
-                    required
-                    value={formData.institute}
-                    onChange={(e) =>
-                      setFormData({ ...formData, institute: e.target.value })
-                    }
-                    className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                    placeholder="Your College Name"
-                  />
+                {/* Team Size */}
+                <div>
+                  <label className="block mb-3 label-mono text-muted-foreground">
+                    Number of Team Members
+                  </label>
+                  <div className="grid grid-cols-3 gap-4">
+                    {[2, 3, 4, 5].map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => handleTeamSizeChange(size.toString())}
+                        className={`
+                        py-4 rounded-xl border transition-all duration-200
+                        flex flex-col items-center justify-center gap-2
+                        ${Number(formData.teamSize) === size
+                            ? "bg-primary/10 border-primary text-primary shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+                            : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-card/80"
+                          }
+                      `}
+                      >
+                        <Users
+                          weight={
+                            Number(formData.teamSize) === size
+                              ? "duotone"
+                              : "regular"
+                          }
+                          className="w-6 h-6"
+                        />
+                        <span className="text-lg font-bold font-display">
+                          {size} Members
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block mb-2 label-mono text-muted-foreground">
-                  Brief Description of Idea
-                </label>
-                <div className="relative">
-                  <FileText className="absolute w-5 h-5 left-4 top-4 text-muted-foreground" />
-                  <textarea
-                    required
-                    rows={4}
-                    value={formData.idea_desc}
-                    onChange={(e) =>
-                      setFormData({ ...formData, idea_desc: e.target.value })
-                    }
-                    className="w-full py-4 pl-12 pr-4 transition-all border resize-none bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                    placeholder="Describe your idea in a few sentences..."
-                  />
+                {/* Team Members */}
+                {teamMembers.map((member, index) => (
+                  <motion.div
+                    key={index}
+                    className="p-4 border rounded-xl bg-card/50 border-border"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <h4 className="mb-3 text-sm font-medium text-muted-foreground">
+                      Team Member {index + 2}
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Full Name"
+                          value={member.name}
+                          onChange={(e) => {
+                            const newMembers = [...teamMembers];
+                            newMembers[index].name = e.target.value;
+                            setTeamMembers(newMembers);
+                          }}
+                          className="w-full px-4 py-3 transition-all border bg-background border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                        />
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="email"
+                          placeholder="Email Address"
+                          value={member.email}
+                          onChange={(e) => {
+                            const newMembers = [...teamMembers];
+                            newMembers[index].email = e.target.value;
+                            setTeamMembers(newMembers);
+                          }}
+                          className="w-full px-4 py-3 transition-all border bg-background border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                        />
+                      </div>
+                      <div className="relative">
+                        <Phone className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                        <input
+                          type="tel"
+                          required
+                          value={member.mobile}
+                          onChange={(e) => {
+                            const newMembers = [...teamMembers];
+                            newMembers[index].mobile = e.target.value;
+                            setTeamMembers(newMembers);
+                          }}
+                          className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                          placeholder="+91 98765 43210"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep(1);
+                      setShowOtpStep(false);
+                    }}
+                    className="flex-1 btn-secondary"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    className="flex-1 btn-primary"
+                  >
+                    Continue
+                  </button>
                 </div>
-              </div>
+              </motion.div>
+            )}
 
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="flex-1 btn-secondary"
-                >
-                  Back
-                </button>
-                <button type="submit" className="flex-1 btn-primary">
-                  Complete Registration
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </form>
+            {/* ╔═══════════════════════════════╗ */}
+            {/* ║  STEP 3 — Idea Details        ║ */}
+            {/* ╚═══════════════════════════════╝ */}
+            {step === 3 && (
+              <motion.div
+                className="space-y-6"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="mb-6 text-xl font-bold font-display text-foreground">
+                  Idea Details
+                </h2>
+
+                <div>
+                  <label className="block mb-2 label-mono text-muted-foreground">
+                    Topic/Theme
+                  </label>
+                  <div className="relative">
+                    <Lightbulb className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                    <input
+                      type="text"
+                      required
+                      value={formData.topic}
+                      onChange={(e) =>
+                        setFormData({ ...formData, topic: e.target.value })
+                      }
+                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      placeholder="AI for Healthcare"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block mb-2 label-mono text-muted-foreground">
+                    Institute/College
+                  </label>
+                  <div className="relative">
+                    <Buildings
+                      className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground"
+                      weight="duotone"
+                    />
+                    <input
+                      type="text"
+                      required
+                      value={formData.institute}
+                      onChange={(e) =>
+                        setFormData({ ...formData, institute: e.target.value })
+                      }
+                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      placeholder="Your College Name"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block mb-2 label-mono text-muted-foreground">
+                    Brief Description of Idea
+                  </label>
+                  <div className="relative">
+                    <FileText className="absolute w-5 h-5 left-4 top-4 text-muted-foreground" />
+                    <textarea
+                      required
+                      rows={4}
+                      value={formData.idea_desc}
+                      onChange={(e) =>
+                        setFormData({ ...formData, idea_desc: e.target.value })
+                      }
+                      className="w-full py-4 pl-12 pr-4 transition-all border resize-none bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      placeholder="Describe your idea in a few sentences..."
+                    />
+                  </div>
+                </div>
+
+                {/* Submit Error */}
+                {submitError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 text-sm text-center text-red-400 border rounded-lg bg-red-500/5 border-red-500/20"
+                  >
+                    {submitError}
+                  </motion.div>
+                )}
+
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="flex-1 btn-secondary"
+                  >
+                    Back
+                  </button>
+                  <button type="submit" className="flex-1 btn-primary">
+                    Complete Registration
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </form>
+        </div>
 
         {/* Login link */}
         <p className="mt-8 text-center text-muted-foreground">
-          Already registered?
-          <Link to="/login" className="text-primary hover:underline">
+          Already registered?{' '}
+          <Link to="/login" className="font-medium text-primary hover:underline">
             Login here
           </Link>
         </p>

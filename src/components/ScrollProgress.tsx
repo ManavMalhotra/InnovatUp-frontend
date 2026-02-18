@@ -4,9 +4,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 const sections = [
     { id: 'hero', label: 'Home' },
     { id: 'who-for', label: 'Who For' },
-    { id: 'timeline', label: 'Timeline' },
     { id: 'mentorship', label: 'Mentorship' },
-    { id: 'prizes', label: 'Prizes' },
     { id: 'rules', label: 'Rules' },
     { id: 'faqs', label: 'FAQs' },
     { id: 'register', label: 'Register' },
