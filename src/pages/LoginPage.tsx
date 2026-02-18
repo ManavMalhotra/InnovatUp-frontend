@@ -1,19 +1,18 @@
-import { useState, useEffect, useRef, Fragment } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ArrowLeft,
   EnvelopeSimple,
-  EnvelopeOpen,
-  ShieldCheck,
-  ArrowClockwise,
-  CircleNotch,
-  Check,
   ArrowRight,
   SignIn,
+  CircleNotch,
+  Check,
   Sparkle,
 } from "@phosphor-icons/react";
 import AnimatedLogo from "../components/AnimatedLogo";
+import OtpVerification from "../components/OtpVerification";
+import { useOtp, maskEmail } from "../hooks/useOtp";
 import axios from "axios";
 
 type LoginStep = "email" | "otp" | "success";
@@ -26,14 +25,14 @@ export default function LoginPage() {
   // ═══════════════════════════════════════
   const [step, setStep] = useState<LoginStep>("email");
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
-  const [resendTimer, setResendTimer] = useState(0);
 
-  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Shared OTP hook
+  const otpState = useOtp();
 
   // ═══════════════════════════════════════
   //  Auto-focus email input on mount
@@ -43,72 +42,9 @@ export default function LoginPage() {
   }, []);
 
   // ═══════════════════════════════════════
-  //  Resend Timer Countdown
-  // ═══════════════════════════════════════
-  useEffect(() => {
-    if (resendTimer > 0) {
-      const timer = setTimeout(() => setResendTimer((prev) => prev - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendTimer]);
-
-  // ═══════════════════════════════════════
-  //  OTP Input Handlers
-  // ═══════════════════════════════════════
-  const handleOtpChange = (index: number, value: string) => {
-    if (value && !/^\d*$/.test(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
-    setOtp(newOtp);
-    setError("");
-    if (value && index < 5) {
-      otpInputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (
-    index: number,
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      otpInputRefs.current[index - 1]?.focus();
-      const newOtp = [...otp];
-      newOtp[index - 1] = "";
-      setOtp(newOtp);
-    }
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleVerifyOtp();
-    }
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent, startIndex: number) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData
-      .getData("text")
-      .replace(/\D/g, "")
-      .slice(0, 6);
-    if (pastedData) {
-      const newOtp = [...otp];
-      for (let i = 0; i < pastedData.length && startIndex + i < 6; i++) {
-        newOtp[startIndex + i] = pastedData[i];
-      }
-      setOtp(newOtp);
-      const nextIndex = Math.min(startIndex + pastedData.length, 5);
-      otpInputRefs.current[nextIndex]?.focus();
-    }
-  };
-
-  // ═══════════════════════════════════════
   //  Masked Email
   // ═══════════════════════════════════════
-  const maskedEmail = (() => {
-    const parts = email.split("@");
-    if (parts.length !== 2 || !parts[0] || !parts[1]) return email;
-    const [local, domain] = parts;
-    const visible = local.slice(0, 2);
-    return `${visible}${"•".repeat(Math.max(local.length - 2, 0))}@${domain}`;
-  })();
+  const maskedEmail = maskEmail(email);
 
   // ═══════════════════════════════════════
   //  Send OTP
@@ -129,7 +65,6 @@ export default function LoginPage() {
     try {
       const baseURL = import.meta.env.VITE_BACKEND_URL;
 
-      // ✅ FormData — matches your backend expectation
       const otpFormData = new FormData();
       otpFormData.append("email", email);
 
@@ -146,9 +81,9 @@ export default function LoginPage() {
       }
 
       setStep("otp");
-      setResendTimer(60);
-      setOtp(["", "", "", "", "", ""]);
-      setTimeout(() => otpInputRefs.current[0]?.focus(), 300);
+      otpState.resetOtp();
+      otpState.startResendTimer();
+      otpState.focusFirstInput(300);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const result = error.response?.data?.result;
@@ -177,22 +112,20 @@ export default function LoginPage() {
   //  Verify OTP
   // ═══════════════════════════════════════
   const handleVerifyOtp = async () => {
-    const otpString = otp.join("");
-    if (otpString.length !== 6) {
-      setError("Please enter the complete 6-digit OTP");
+    if (!otpState.isOtpComplete) {
+      otpState.setOtpError("Please enter the complete 6-digit OTP");
       return;
     }
 
     setVerifyingOtp(true);
-    setError("");
+    otpState.setOtpError("");
 
     try {
       const baseURL = import.meta.env.VITE_BACKEND_URL;
 
-      // ✅ FormData — matches your backend expectation
       const verifyFormData = new FormData();
       verifyFormData.append("email", email);
-      verifyFormData.append("otp", otpString);
+      verifyFormData.append("otp", otpState.otpString);
 
       const response = await axios.post(
         `${baseURL?.replace(/\/$/, "")}/login`,
@@ -204,11 +137,9 @@ export default function LoginPage() {
       switch (result) {
         case "otp-verified":
         case "login-succes":
-          // Store token if backend returns one
           if (response.data?.token) {
             localStorage.setItem("auth_token", response.data.token);
           }
-          // Store email for dashboard use
           localStorage.setItem("user_email", email);
           setStep("success");
           setTimeout(() => navigate("/dashboard"), 2000);
@@ -226,23 +157,22 @@ export default function LoginPage() {
           break;
 
         case "otp-not-verified":
-          setError("Incorrect OTP. Please check and try again.");
-          setOtp(["", "", "", "", "", ""]);
-          setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+          otpState.setOtpError("Incorrect OTP. Please check and try again.");
+          otpState.resetOtp();
+          otpState.focusFirstInput();
           break;
 
         case "no-otp-found":
-          setError("OTP expired or not found. Please request a new one.");
-          setOtp(["", "", "", "", "", ""]);
-          setResendTimer(0);
+          otpState.setOtpError("OTP expired or not found. Please request a new one.");
+          otpState.resetOtp();
           break;
 
         case "server-error":
-          setError("Server error. Please try again later.");
+          otpState.setOtpError("Server error. Please try again later.");
           break;
 
         default:
-          setError("Unexpected response. Please try again.");
+          otpState.setOtpError("Unexpected response. Please try again.");
           break;
       }
     } catch (error) {
@@ -251,20 +181,19 @@ export default function LoginPage() {
         const detail = error.response?.data?.detail;
 
         if (result === "otp-not-verified") {
-          setError("Incorrect OTP. Please check and try again.");
+          otpState.setOtpError("Incorrect OTP. Please check and try again.");
         } else if (result === "no-otp-found") {
-          setError("OTP expired or not found. Please request a new one.");
-          setResendTimer(0);
+          otpState.setOtpError("OTP expired or not found. Please request a new one.");
         } else if (result === "server-error") {
-          setError("Server error. Please try again later.");
+          otpState.setOtpError("Server error. Please try again later.");
         } else {
-          setError(detail || "Verification failed. Please try again.");
+          otpState.setOtpError(detail || "Verification failed. Please try again.");
         }
 
-        setOtp(["", "", "", "", "", ""]);
-        setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+        otpState.resetOtp();
+        otpState.focusFirstInput();
       } else {
-        setError("Something went wrong. Please try again.");
+        otpState.setOtpError("Something went wrong. Please try again.");
       }
     } finally {
       setVerifyingOtp(false);
@@ -272,7 +201,7 @@ export default function LoginPage() {
   };
 
   const handleResendOtp = () => {
-    if (resendTimer > 0) return;
+    if (otpState.resendTimer > 0) return;
     handleSendOtp();
   };
 
@@ -390,8 +319,7 @@ export default function LoginPage() {
             onClick={() => {
               if (step === "otp") {
                 setStep("email");
-                setOtp(["", "", "", "", "", ""]);
-                setError("");
+                otpState.resetOtp();
               }
             }}
             className={`label-mono text-xs transition-colors ${step === "email"
@@ -413,9 +341,7 @@ export default function LoginPage() {
         {/*  Animated Step Container            */}
         {/* ═══════════════════════════════════ */}
         <AnimatePresence mode="wait">
-          {/* ╔═══════════════════════════════╗ */}
-          {/* ║  EMAIL STEP                   ║ */}
-          {/* ╚═══════════════════════════════╝ */}
+          {/* EMAIL STEP */}
           {step === "email" && (
             <motion.div
               key="email-step"
@@ -529,156 +455,22 @@ export default function LoginPage() {
             </motion.div>
           )}
 
-          {/* ╔═══════════════════════════════╗ */}
-          {/* ║  OTP VERIFICATION STEP        ║ */}
-          {/* ╚═══════════════════════════════╝ */}
+          {/* OTP VERIFICATION STEP — now uses shared component */}
           {step === "otp" && (
-            <motion.div
+            <OtpVerification
               key="otp-step"
-              className="space-y-8"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Icon & Title */}
-              <div className="text-center">
-                <motion.div
-                  className="flex items-center justify-center w-16 h-16 mx-auto mb-5 rounded-full bg-primary/10"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", delay: 0.1 }}
-                >
-                  <EnvelopeOpen
-                    weight="duotone"
-                    className="w-8 h-8 text-primary"
-                  />
-                </motion.div>
-                <h2 className="mb-2 text-xl font-bold font-display text-foreground">
-                  Check Your Inbox
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Enter the 6-digit code sent to
-                </p>
-                <p className="mt-1 text-sm font-medium text-foreground">
-                  {maskedEmail}
-                </p>
-              </div>
-
-              {/* OTP Input Boxes */}
-              <div className="flex items-center justify-center gap-2 sm:gap-3">
-                {otp.map((digit, index) => (
-                  <Fragment key={index}>
-                    {index === 3 && (
-                      <span className="text-xl font-bold text-muted-foreground/40">
-                        –
-                      </span>
-                    )}
-                    <motion.input
-                      ref={(el) => {
-                        otpInputRefs.current[index] = el;
-                      }}
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleOtpChange(index, e.target.value)}
-                      onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                      onPaste={(e) => handleOtpPaste(e, index)}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className={`
-                        w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold font-display
-                        border-2 rounded-xl transition-all duration-200
-                        bg-card text-foreground
-                        focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
-                        ${digit
-                          ? "border-primary/50 bg-primary/5"
-                          : "border-border"
-                        }
-                        ${error ? "border-red-400/50" : ""}
-                      `}
-                    />
-                  </Fragment>
-                ))}
-              </div>
-
-              {/* Error Message */}
-              {error && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-center text-red-400"
-                >
-                  {error}
-                </motion.p>
-              )}
-
-              {/* Resend Timer / Button */}
-              <div className="text-center">
-                {resendTimer > 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    Resend code in{" "}
-                    <span className="font-mono font-medium text-foreground">
-                      {String(Math.floor(resendTimer / 60)).padStart(2, "0")}:
-                      {String(resendTimer % 60).padStart(2, "0")}
-                    </span>
-                  </p>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleResendOtp}
-                    disabled={sendingOtp}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
-                  >
-                    {sendingOtp ? (
-                      <CircleNotch className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <ArrowClockwise className="w-4 h-4" />
-                    )}
-                    Resend OTP
-                  </button>
-                )}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep("email");
-                    setOtp(["", "", "", "", "", ""]);
-                    setError("");
-                  }}
-                  className="flex-1 btn-secondary"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleVerifyOtp}
-                  disabled={verifyingOtp || otp.join("").length !== 6}
-                  className="flex-1 btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {verifyingOtp ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <CircleNotch className="w-5 h-5 animate-spin" />
-                      Verifying...
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <ShieldCheck className="w-5 h-5" />
-                      Verify & Login
-                    </span>
-                  )}
-                </button>
-              </div>
-            </motion.div>
+              otpState={otpState}
+              maskedEmail={maskedEmail}
+              verifying={verifyingOtp}
+              sendingOtp={sendingOtp}
+              onVerify={handleVerifyOtp}
+              onBack={() => {
+                setStep("email");
+                otpState.resetOtp();
+              }}
+              onResend={handleResendOtp}
+              verifyLabel="Verify & Login"
+            />
           )}
         </AnimatePresence>
 

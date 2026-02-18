@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Fragment } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import {
@@ -12,11 +12,11 @@ import {
   FileText,
   Check,
   ShieldCheck,
-  ArrowClockwise,
   CircleNotch,
-  EnvelopeOpen,
 } from "@phosphor-icons/react";
 import AnimatedLogo from "../components/AnimatedLogo";
+import OtpVerification from "../components/OtpVerification";
+import { useOtp, maskEmail } from "../hooks/useOtp";
 import axios from "axios";
 
 interface TeamMember {
@@ -61,94 +61,37 @@ export default function RegistrationPage() {
   //  OTP Verification State
   // ═══════════════════════════════════════
   const [showOtpStep, setShowOtpStep] = useState(false);
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [emailVerified, setEmailVerified] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
-  const [otpError, setOtpError] = useState("");
-  const [resendTimer, setResendTimer] = useState(0);
-  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // ═══════════════════════════════════════
-  //  Resend Timer Countdown
-  // ═══════════════════════════════════════
-  useEffect(() => {
-    if (resendTimer > 0) {
-      const timer = setTimeout(() => setResendTimer((prev) => prev - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendTimer]);
+  // Shared OTP hook
+  const otpState = useOtp();
 
-  // ═══════════════════════════════════════
-  //  OTP Input Handlers
-  // ═══════════════════════════════════════
-  const handleOtpChange = (index: number, value: string) => {
-    if (value && !/^\d*$/.test(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
-    setOtp(newOtp);
-    setOtpError("");
-    if (value && index < 5) {
-      otpInputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (
-    index: number,
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      otpInputRefs.current[index - 1]?.focus();
-      const newOtp = [...otp];
-      newOtp[index - 1] = "";
-      setOtp(newOtp);
-    }
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleVerifyOtp();
-    }
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent, startIndex: number) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData
-      .getData("text")
-      .replace(/\D/g, "")
-      .slice(0, 6);
-    if (pastedData) {
-      const newOtp = [...otp];
-      for (let i = 0; i < pastedData.length && startIndex + i < 6; i++) {
-        newOtp[startIndex + i] = pastedData[i];
-      }
-      setOtp(newOtp);
-      const nextIndex = Math.min(startIndex + pastedData.length, 5);
-      otpInputRefs.current[nextIndex]?.focus();
-    }
-  };
 
   // ═══════════════════════════════════════
   //  Send OTP
   // ═══════════════════════════════════════
   const handleSendOtp = async () => {
     if (!formData.leaderName.trim()) {
-      setOtpError("Please enter your full name");
+      otpState.setOtpError("Please enter your full name");
       return;
     }
     if (!formData.email.trim()) {
-      setOtpError("Please enter your email address");
+      otpState.setOtpError("Please enter your email address");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setOtpError("Please enter a valid email address");
+      otpState.setOtpError("Please enter a valid email address");
       return;
     }
     if (!formData.mobile.trim()) {
-      setOtpError("Please enter your mobile number");
+      otpState.setOtpError("Please enter your mobile number");
       return;
     }
 
     setSendingOtp(true);
-    setOtpError("");
+    otpState.setOtpError("");
 
     try {
       const baseURL = import.meta.env.VITE_BACKEND_URL;
@@ -159,41 +102,41 @@ export default function RegistrationPage() {
       await axios.post(`${baseURL?.replace(/\/$/, "")}/send-otp`, otpFormData);
 
       setShowOtpStep(true);
-      setResendTimer(60);
-      setOtp(["", "", "", "", "", ""]);
-      setTimeout(() => otpInputRefs.current[0]?.focus(), 300);
+      otpState.startResendTimer();
+      otpState.resetOtp();
+      otpState.focusFirstInput(300);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        setOtpError(
+        otpState.setOtpError(
           error.response?.data?.detail ||
-            "Failed to send OTP. Please try again.",
+          "Failed to send OTP. Please try again.",
         );
       } else {
-        setOtpError("Something went wrong. Please try again.");
+        otpState.setOtpError("Something went wrong. Please try again.");
       }
     } finally {
       setSendingOtp(false);
     }
   };
+
   // ═══════════════════════════════════════
   //  Verify OTP
   // ═══════════════════════════════════════
   const handleVerifyOtp = async () => {
-    const otpString = otp.join("");
-    if (otpString.length !== 6) {
-      setOtpError("Please enter the complete 6-digit OTP");
+    if (!otpState.isOtpComplete) {
+      otpState.setOtpError("Please enter the complete 6-digit OTP");
       return;
     }
 
     setVerifyingOtp(true);
-    setOtpError("");
+    otpState.setOtpError("");
 
     try {
       const baseURL = import.meta.env.VITE_BACKEND_URL;
 
       const verifyFormData = new FormData();
       verifyFormData.append("email", formData.email);
-      verifyFormData.append("otp", otpString);
+      verifyFormData.append("otp", otpState.otpString);
 
       const response = await axios.post(
         `${baseURL?.replace(/\/$/, "")}/verify-otp`,
@@ -210,46 +153,43 @@ export default function RegistrationPage() {
           break;
 
         case "otp-not-verified":
-          setOtpError("Incorrect OTP. Please check and try again.");
-          setOtp(["", "", "", "", "", ""]);
-          setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+          otpState.setOtpError("Incorrect OTP. Please check and try again.");
+          otpState.resetOtp();
+          otpState.focusFirstInput();
           break;
 
         case "no-otp-found":
-          setOtpError("OTP expired or not found. Please request a new one.");
-          setOtp(["", "", "", "", "", ""]);
-          setResendTimer(0); // Allow immediate resend
+          otpState.setOtpError("OTP expired or not found. Please request a new one.");
+          otpState.resetOtp();
           break;
 
         case "server-error":
-          setOtpError("Server error. Please try again later.");
+          otpState.setOtpError("Server error. Please try again later.");
           break;
 
         default:
-          setOtpError("Unexpected response. Please try again.");
+          otpState.setOtpError("Unexpected response. Please try again.");
           break;
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Backend might also return result in error responses
         const result = error.response?.data?.result;
         const detail = error.response?.data?.detail;
 
         if (result === "otp-not-verified") {
-          setOtpError("Incorrect OTP. Please check and try again.");
+          otpState.setOtpError("Incorrect OTP. Please check and try again.");
         } else if (result === "no-otp-found") {
-          setOtpError("OTP expired or not found. Please request a new one.");
-          setResendTimer(0);
+          otpState.setOtpError("OTP expired or not found. Please request a new one.");
         } else if (result === "server-error") {
-          setOtpError("Server error. Please try again later.");
+          otpState.setOtpError("Server error. Please try again later.");
         } else {
-          setOtpError(detail || "Verification failed. Please try again.");
+          otpState.setOtpError(detail || "Verification failed. Please try again.");
         }
 
-        setOtp(["", "", "", "", "", ""]);
-        setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+        otpState.resetOtp();
+        otpState.focusFirstInput();
       } else {
-        setOtpError("Something went wrong. Please try again.");
+        otpState.setOtpError("Something went wrong. Please try again.");
       }
     } finally {
       setVerifyingOtp(false);
@@ -257,7 +197,7 @@ export default function RegistrationPage() {
   };
 
   const handleResendOtp = () => {
-    if (resendTimer > 0) return;
+    if (otpState.resendTimer > 0) return;
     handleSendOtp();
   };
 
@@ -325,8 +265,7 @@ export default function RegistrationPage() {
       if (axios.isAxiosError(error)) {
         console.error("Server Error Response:", error.response?.data);
         alert(
-          `Registration failed: ${
-            error.response?.data?.detail || "Check inputs"
+          `Registration failed: ${error.response?.data?.detail || "Check inputs"
           }`,
         );
       } else {
@@ -367,12 +306,7 @@ export default function RegistrationPage() {
   // ═══════════════════════════════════════
   //  Masked email for OTP screen
   // ═══════════════════════════════════════
-  const maskedEmail = (() => {
-    const [local, domain] = formData.email.split("@");
-    if (!local || !domain) return formData.email;
-    const visible = local.slice(0, 2);
-    return `${visible}${"•".repeat(Math.max(local.length - 2, 0))}@${domain}`;
-  })();
+  const maskedEmail = maskEmail(formData.email);
 
   // ═══════════════════════════════════════
   //  Main Render
@@ -412,9 +346,8 @@ export default function RegistrationPage() {
           {[1, 2, 3].map((s) => (
             <motion.div
               key={s}
-              className={`h-1 flex-1 rounded-full transition-colors ${
-                s <= step ? "bg-primary" : "bg-border"
-              }`}
+              className={`h-1 flex-1 rounded-full transition-colors ${s <= step ? "bg-primary" : "bg-border"
+                }`}
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: s * 0.1 }}
@@ -434,11 +367,10 @@ export default function RegistrationPage() {
                 setStep(i + 1);
                 setShowOtpStep(false);
               }}
-              className={`label-mono text-xs transition-colors ${
-                i + 1 <= step
-                  ? "text-primary cursor-pointer hover:text-primary/80"
-                  : "text-muted-foreground cursor-default"
-              }`}
+              className={`label-mono text-xs transition-colors ${i + 1 <= step
+                ? "text-primary cursor-pointer hover:text-primary/80"
+                : "text-muted-foreground cursor-default"
+                }`}
             >
               {label}
               {label === "Leader" && emailVerified && (
@@ -503,14 +435,12 @@ export default function RegistrationPage() {
                     value={formData.email}
                     onChange={(e) => {
                       setFormData({ ...formData, email: e.target.value });
-                      // Reset verification if email changes
                       if (emailVerified) {
                         setEmailVerified(false);
                       }
                     }}
-                    className={`w-full py-4 pl-12 pr-12 transition-all border bg-card rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary ${
-                      emailVerified ? "border-green-500/50" : "border-border"
-                    }`}
+                    className={`w-full py-4 pl-12 pr-12 transition-all border bg-card rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary ${emailVerified ? "border-green-500/50" : "border-border"
+                      }`}
                     placeholder="you@college.edu"
                   />
                   {emailVerified && (
@@ -559,13 +489,13 @@ export default function RegistrationPage() {
               </div>
 
               {/* Error from OTP sending */}
-              {otpError && !showOtpStep && (
+              {otpState.otpError && !showOtpStep && (
                 <motion.p
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-sm text-center text-red-400"
                 >
-                  {otpError}
+                  {otpState.otpError}
                 </motion.p>
               )}
 
@@ -605,151 +535,22 @@ export default function RegistrationPage() {
           {/* ║  STEP 1.5 — OTP Verification  ║ */}
           {/* ╚═══════════════════════════════╝ */}
           {step === 1 && showOtpStep && (
-            <motion.div
-              className="space-y-8"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Icon & Title */}
-              <div className="text-center">
-                <motion.div
-                  className="flex items-center justify-center w-16 h-16 mx-auto mb-5 rounded-full bg-primary/10"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", delay: 0.1 }}
-                >
-                  <EnvelopeOpen
-                    weight="duotone"
-                    className="w-8 h-8 text-primary"
-                  />
-                </motion.div>
-                <h2 className="mb-2 text-xl font-bold font-display text-foreground">
-                  Verify Your Email
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  We've sent a 6-digit verification code to
-                </p>
-                <p className="mt-1 text-sm font-medium text-foreground">
-                  {maskedEmail}
-                </p>
-              </div>
-
-              {/* OTP Input Boxes */}
-              <div className="flex items-center justify-center gap-2 sm:gap-3">
-                {otp.map((digit, index) => (
-                  <Fragment key={index}>
-                    {index === 3 && (
-                      <span className="text-xl font-bold text-muted-foreground/40">
-                        –
-                      </span>
-                    )}
-                    <motion.input
-                      ref={(el) => {
-                        otpInputRefs.current[index] = el;
-                      }}
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleOtpChange(index, e.target.value)}
-                      onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                      onPaste={(e) => handleOtpPaste(e, index)}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className={`
-                        w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold font-display
-                        border-2 rounded-xl transition-all duration-200
-                        bg-card text-foreground
-                        focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
-                        ${
-                          digit
-                            ? "border-primary/50 bg-primary/5"
-                            : "border-border"
-                        }
-                        ${otpError ? "border-red-400/50" : ""}
-                      `}
-                    />
-                  </Fragment>
-                ))}
-              </div>
-
-              {/* Error Message */}
-              {otpError && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-center text-red-400"
-                >
-                  {otpError}
-                </motion.p>
-              )}
-
-              {/* Resend Timer / Button */}
-              <div className="text-center">
-                {resendTimer > 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    Resend code in{" "}
-                    <span className="font-mono font-medium text-foreground">
-                      {String(Math.floor(resendTimer / 60)).padStart(2, "0")}:
-                      {String(resendTimer % 60).padStart(2, "0")}
-                    </span>
-                  </p>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleResendOtp}
-                    disabled={sendingOtp}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
-                  >
-                    {sendingOtp ? (
-                      <CircleNotch className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <ArrowClockwise className="w-4 h-4" />
-                    )}
-                    Resend OTP
-                  </button>
-                )}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowOtpStep(false);
-                    setOtp(["", "", "", "", "", ""]);
-                    setOtpError("");
-                  }}
-                  className="flex-1 btn-secondary"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <ArrowLeft className="w-4 h-4" />
-                    Change Email
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleVerifyOtp}
-                  disabled={verifyingOtp || otp.join("").length !== 6}
-                  className="flex-1 btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {verifyingOtp ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <CircleNotch className="w-5 h-5 animate-spin" />
-                      Verifying...
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <ShieldCheck className="w-5 h-5" />
-                      Verify & Continue
-                    </span>
-                  )}
-                </button>
-              </div>
-            </motion.div>
+            <OtpVerification
+              otpState={otpState}
+              maskedEmail={maskedEmail}
+              verifying={verifyingOtp}
+              sendingOtp={sendingOtp}
+              onVerify={handleVerifyOtp}
+              onBack={() => {
+                setShowOtpStep(false);
+                otpState.resetOtp();
+              }}
+              onResend={handleResendOtp}
+              backLabel="Change Email"
+              verifyLabel="Verify & Continue"
+              title="Verify Your Email"
+              subtitle="We've sent a 6-digit verification code to"
+            />
           )}
 
           {/* ╔═══════════════════════════════╗ */}
@@ -800,10 +601,9 @@ export default function RegistrationPage() {
                       className={`
                         py-4 rounded-xl border transition-all duration-200
                         flex flex-col items-center justify-center gap-2
-                        ${
-                          Number(formData.teamSize) === size
-                            ? "bg-primary/10 border-primary text-primary shadow-[0_0_20px_rgba(59,130,246,0.15)]"
-                            : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-card/80"
+                        ${Number(formData.teamSize) === size
+                          ? "bg-primary/10 border-primary text-primary shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+                          : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-card/80"
                         }
                       `}
                     >

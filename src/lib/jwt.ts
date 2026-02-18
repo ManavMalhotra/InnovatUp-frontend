@@ -1,19 +1,7 @@
-export interface User {
-    sub: string;
-    email: string;
-    name: string;
-    mobile: string;
-    teamName?: string;
-    team_count?: number;
-    team_members?: Array<{
-        name: string;
-        email: string;
-        mobile: string;
-    }>;
-    institute?: string;
-    idea_desc?: string;
-    role?: "admin" | "user";
-}
+import { type User } from '../types/auth';
+
+// Re-export so existing consumers (e.g. DashboardPage) don't break
+export type { User };
 
 /**
  * Decode JWT payload without verification (client-side only).
@@ -59,9 +47,35 @@ export function isTokenExpired(): boolean {
 }
 
 /**
- * Clear auth data from localStorage.
+ * Clear auth data from both localStorage and sessionStorage.
  */
 export function clearAuth(): void {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user_email");
+    sessionStorage.removeItem("is_admin");
+    sessionStorage.removeItem("admin_email");
+    sessionStorage.removeItem("admin_users");
 }
+
+/**
+ * Read the user's role from the stored JWT.
+ * Returns "admin" | "user" | null.
+ */
+export function getUserRole(): "admin" | "user" | null {
+    const user = getUser();
+    return user?.role ?? null;
+}
+
+/**
+ * Check whether the current session has admin privileges.
+ * Prefers the JWT `role` claim; falls back to the sessionStorage flag
+ * for backward compatibility with backends that don't issue admin JWTs.
+ */
+export function isAdmin(): boolean {
+    const role = getUserRole();
+    if (role === "admin") return true;
+
+    // Fallback: legacy sessionStorage flag (less secure — see architecture review)
+    return sessionStorage.getItem("is_admin") === "true";
+}
+

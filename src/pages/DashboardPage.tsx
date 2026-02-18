@@ -19,7 +19,7 @@ import {
   CircleNotch,
 } from '@phosphor-icons/react';
 import AnimatedLogo from '../components/AnimatedLogo';
-import { clearAuth, type User } from '../lib/jwt';
+import { clearAuth, isAdmin as checkIsAdmin, type User } from '../lib/jwt';
 import api from '../lib/api';
 import * as XLSX from 'xlsx';
 
@@ -47,9 +47,8 @@ export default function DashboardPage() {
   //  Load user data on mount
   // ═══════════════════════════════════════
   useEffect(() => {
-    // Check if admin session
-    const adminFlag = sessionStorage.getItem('is_admin');
-    if (adminFlag === 'true') {
+    // Check if admin session (JWT role claim or legacy flag)
+    if (checkIsAdmin()) {
       setIsAdmin(true);
       try {
         const usersData = sessionStorage.getItem('admin_users');
@@ -87,10 +86,7 @@ export default function DashboardPage() {
   //  Handlers
   // ═══════════════════════════════════════
   const handleLogout = () => {
-    clearAuth();
-    sessionStorage.removeItem('is_admin');
-    sessionStorage.removeItem('admin_email');
-    sessionStorage.removeItem('admin_users');
+    clearAuth(); // Clears both localStorage and sessionStorage
     navigate('/login');
   };
 
