@@ -28,7 +28,7 @@ export default function FooterSection() {
   };
 
   return (
-    <footer className="relative py-16 bg-card border-t border-border overflow-hidden">
+    <footer className="relative py-16 overflow-hidden border-t bg-card border-border">
       {/* Subtle horizontal lines pattern */}
       <div
         className="absolute inset-0 opacity-[0.02]"
@@ -38,27 +38,29 @@ export default function FooterSection() {
         }}
       />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+      <div className="relative max-w-6xl px-4 mx-auto sm:px-6 lg:px-12">
+        <div className="grid grid-cols-1 gap-12 mb-12 md:grid-cols-3">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
               <AnimatedLogo size={40} animate={false} />
-              <span className="font-display font-bold text-xl text-foreground">
+              <span className="text-xl font-bold font-display text-foreground">
                 Innovat<span className="text-primary">Up</span>
               </span>
             </Link>
-            <p className="body-text text-sm mb-4">
+            <p className="mb-4 text-sm body-text">
               {siteConfig.footer.tagline}
             </p>
             <p className="text-xs text-muted-foreground">
+            <Link to="https://bciit.ac.in" className="transition-colors hover:text-primary">
               {siteConfig.collegeName}
+            </Link>
             </p>
           </div>
 
           {/* Quick links */}
           <div>
-            <h4 className="font-display font-bold text-foreground mb-4">
+            <h4 className="mb-4 font-bold font-display text-foreground">
               Quick Links
             </h4>
             <ul className="space-y-2">
@@ -66,7 +68,7 @@ export default function FooterSection() {
                 <li key={link.label}>
                   <button
                     onClick={() => scrollToSection(link.href)}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-sm transition-colors text-muted-foreground hover:text-primary"
                   >
                     {link.label}
                   </button>
@@ -77,7 +79,7 @@ export default function FooterSection() {
 
           {/* Connect */}
           <div>
-            <h4 className="font-display font-bold text-foreground mb-4">
+            <h4 className="mb-4 font-bold font-display text-foreground">
               Connect
             </h4>
             <div className="flex gap-3">
@@ -89,7 +91,7 @@ export default function FooterSection() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+                    className="flex items-center justify-center w-10 h-10 transition-colors border rounded-xl bg-background border-border text-muted-foreground hover:text-primary hover:border-primary"
                     whileHover={{ y: -2 }}
                     aria-label={social.label}
                   >
@@ -98,14 +100,14 @@ export default function FooterSection() {
                 );
               })}
             </div>
-            <p className="text-sm text-muted-foreground mt-4">
+            <p className="mt-4 text-sm text-muted-foreground">
               {siteConfig.social.email}
             </p>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col items-center justify-between gap-4 pt-8 border-t border-border sm:flex-row">
           <p className="text-xs text-muted-foreground">
             {siteConfig.footer.copyright}
           </p>
