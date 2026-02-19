@@ -240,7 +240,7 @@ export const siteConfig = {
     // ==========================================
     social: {
         instagram: "https://www.instagram.com/innovatup_society",
-        linkedin: "https://linkedin.com/company/innovatup",
+        // linkedin: "https://linkedin.com/company/innovatup",
         email: "innovatup@bciit.ac.in",
     },
 
