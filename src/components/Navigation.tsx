@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, memo, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence, type Variants } from 'motion/react';
-import { List, X } from '@phosphor-icons/react';
-import AnimatedLogo from './AnimatedLogo';
+import { useState, useEffect, useCallback, memo, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence, type Variants } from "motion/react";
+import { List, X } from "@phosphor-icons/react";
+import AnimatedLogo from "./AnimatedLogo";
 
 // ═══════════════════════════════════════════════════════════════════
 // CONSTANTS & TYPES
@@ -14,10 +14,10 @@ interface NavLink {
 }
 
 const NAV_LINKS: readonly NavLink[] = [
-  { label: 'About', href: '#what-is' },
-  { label: 'Timeline', href: '#timeline' },
-  { label: 'Prizes', href: '#prizes' },
-  { label: 'FAQs', href: '#faqs' },
+  { label: "About", href: "#what-is" },
+  { label: "Timeline", href: "#timeline" },
+  { label: "Prizes", href: "#prizes" },
+  { label: "FAQs", href: "#faqs" },
 ] as const;
 
 const SCROLL_THRESHOLD = 100;
@@ -32,7 +32,7 @@ const navVariants: Variants = {
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.6, ease: 'easeOut' }
+    transition: { duration: 0.6, ease: "easeOut" },
   },
 };
 
@@ -47,7 +47,7 @@ const menuContentVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.3, delay: 0.1 }
+    transition: { duration: 0.3, delay: 0.1 },
   },
   exit: { opacity: 0, y: 20 },
 };
@@ -57,7 +57,7 @@ const menuItemVariants: Variants = {
   visible: (index: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.15 + index * 0.05 }
+    transition: { delay: 0.15 + index * 0.05 },
   }),
 };
 
@@ -86,8 +86,8 @@ const useScrolled = (threshold = SCROLL_THRESHOLD): boolean => {
     // Check initial scroll position
     setIsScrolled(window.scrollY > threshold);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [threshold]);
 
   return isScrolled;
@@ -110,15 +110,15 @@ const useMobileMenu = () => {
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
       // Restore focus when closing
       previousActiveElement.current?.focus();
     }
 
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -127,16 +127,16 @@ const useMobileMenu = () => {
     if (!isOpen) return;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
 
-  const toggle = useCallback(() => setIsOpen(prev => !prev), []);
+  const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
   const close = useCallback(() => setIsOpen(false), []);
 
   return { isOpen, toggle, close };
@@ -150,70 +150,68 @@ interface NavLogoProps {
   className?: string;
 }
 
-const NavLogo = memo<NavLogoProps>(({ className = '' }) => (
+const NavLogo = memo<NavLogoProps>(({ className = "" }) => (
   <Link
     to="/"
     className={`flex items-center gap-3 group ${className}`}
     aria-label="InnovatUp - Go to homepage"
   >
-    <div className="w-8 h-8 lg:w-10 lg:h-10 relative">
+    {/* FIXED: Changed to w-10 h-10 (40px) to perfectly contain the 40px logo */}
+    <div className="flex items-center justify-center w-10 h-10">
       <AnimatedLogo size={40} animate={false} />
     </div>
-    <span className="font-display font-bold text-lg lg:text-xl text-foreground tracking-tight">
+    <span className="text-lg font-bold tracking-tight font-display lg:text-xl text-foreground">
       Innovat<span className="text-primary">Up</span>
     </span>
   </Link>
 ));
-NavLogo.displayName = 'NavLogo';
+NavLogo.displayName = "NavLogo";
 
 // ─────────────────────────────────────────────────────────────────
 
 interface NavLinkButtonProps {
   link: NavLink;
   onClick: (href: string) => void;
-  variant?: 'desktop' | 'mobile';
+  variant?: "desktop" | "mobile";
   index?: number;
 }
 
-const NavLinkButton = memo<NavLinkButtonProps>(({
-  link,
-  onClick,
-  variant = 'desktop',
-  index = 0
-}) => {
-  const handleClick = useCallback(() => {
-    onClick(link.href);
-  }, [onClick, link.href]);
+const NavLinkButton = memo<NavLinkButtonProps>(
+  ({ link, onClick, variant = "desktop", index = 0 }) => {
+    const handleClick = useCallback(() => {
+      onClick(link.href);
+    }, [onClick, link.href]);
 
-  if (variant === 'mobile') {
+    if (variant === "mobile") {
+      return (
+        <motion.button
+          onClick={handleClick}
+          className="px-4 py-2 text-2xl font-bold transition-colors rounded-lg font-display text-foreground hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          variants={menuItemVariants}
+          custom={index}
+          initial="hidden"
+          animate="visible"
+        >
+          {link.label}
+        </motion.button>
+      );
+    }
+
     return (
-      <motion.button
+      <button
         onClick={handleClick}
-        className="text-2xl font-display font-bold text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg px-4 py-2"
-        variants={menuItemVariants}
-        custom={index}
-        initial="hidden"
-        animate="visible"
+        className="relative text-sm transition-colors duration-200 text-muted-foreground hover:text-foreground group focus:outline-none focus-visible:text-foreground"
       >
         {link.label}
-      </motion.button>
+        <span
+          className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-full group-focus-visible:w-full"
+          aria-hidden="true"
+        />
+      </button>
     );
-  }
-
-  return (
-    <button
-      onClick={handleClick}
-      className="relative text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 group focus:outline-none focus-visible:text-foreground"
-    >
-      {link.label}
-      <span
-        className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-full group-focus-visible:w-full"
-        aria-hidden="true"
-      />
-    </button>
-  );
-});
-NavLinkButton.displayName = 'NavLinkButton';
+  },
+);
+NavLinkButton.displayName = "NavLinkButton";
 
 // ─────────────────────────────────────────────────────────────────
 
@@ -222,24 +220,28 @@ interface DesktopNavProps {
   onScrollToSection: (href: string) => void;
 }
 
-const DesktopNav = memo<DesktopNavProps>(({ isLandingPage, onScrollToSection }) => (
-  <div className="hidden lg:flex items-center gap-8">
-    {isLandingPage && NAV_LINKS.map((link) => (
-      <NavLinkButton
-        key={link.label}
-        link={link}
-        onClick={onScrollToSection}
-      />
-    ))}
-    <Link
-      to="/register"
-      className="btn-primary text-sm py-2.5 px-5"
-    >
-      Register Now
-    </Link>
-  </div>
-));
-DesktopNav.displayName = 'DesktopNav';
+const DesktopNav = memo<DesktopNavProps>(
+  ({ isLandingPage, onScrollToSection }) => (
+    <div className="items-center hidden gap-8 lg:flex">
+      {isLandingPage &&
+        NAV_LINKS.map((link) => (
+          <NavLinkButton
+            key={link.label}
+            link={link}
+            onClick={onScrollToSection}
+          />
+        ))}
+      <Link to="/login" className="text-sm ">
+        Login
+      </Link>
+
+      <Link to="/register" className="btn-primary text-sm py-2.5 px-5">
+        Register Now
+      </Link>
+    </div>
+  ),
+);
+DesktopNav.displayName = "DesktopNav";
 
 // ─────────────────────────────────────────────────────────────────
 
@@ -251,8 +253,8 @@ interface MobileMenuButtonProps {
 const MobileMenuButton = memo<MobileMenuButtonProps>(({ isOpen, onClick }) => (
   <button
     onClick={onClick}
-    className="lg:hidden p-2 text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
-    aria-label={isOpen ? 'Close menu' : 'Open menu'}
+    className="p-2 transition-colors rounded-lg lg:hidden text-foreground hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    aria-label={isOpen ? "Close menu" : "Open menu"}
     aria-expanded={isOpen}
     aria-controls="mobile-menu"
   >
@@ -263,7 +265,7 @@ const MobileMenuButton = memo<MobileMenuButtonProps>(({ isOpen, onClick }) => (
     )}
   </button>
 ));
-MobileMenuButton.displayName = 'MobileMenuButton';
+MobileMenuButton.displayName = "MobileMenuButton";
 
 // ─────────────────────────────────────────────────────────────────
 
@@ -274,108 +276,101 @@ interface MobileMenuOverlayProps {
   onScrollToSection: (href: string) => void;
 }
 
-const MobileMenuOverlay = memo<MobileMenuOverlayProps>(({
-  isOpen,
-  isLandingPage,
-  onClose,
-  onScrollToSection
-}) => {
-  const menuRef = useRef<HTMLDivElement>(null);
+const MobileMenuOverlay = memo<MobileMenuOverlayProps>(
+  ({ isOpen, isLandingPage, onClose, onScrollToSection }) => {
+    const menuRef = useRef<HTMLDivElement>(null);
 
-  // Focus first focusable element when menu opens
-  useEffect(() => {
-    if (isOpen && menuRef.current) {
-      const firstFocusable = menuRef.current.querySelector<HTMLElement>(
-        'button, a, [tabindex]:not([tabindex="-1"])'
-      );
-      firstFocusable?.focus();
-    }
-  }, [isOpen]);
+    // Focus first focusable element when menu opens
+    useEffect(() => {
+      if (isOpen && menuRef.current) {
+        const firstFocusable = menuRef.current.querySelector<HTMLElement>(
+          'button, a, [tabindex]:not([tabindex="-1"])',
+        );
+        firstFocusable?.focus();
+      }
+    }, [isOpen]);
 
-  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
-    // Only close if clicking the overlay itself, not its children
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  }, [onClose]);
+    const handleOverlayClick = useCallback(
+      (e: React.MouseEvent) => {
+        // Only close if clicking the overlay itself, not its children
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      },
+      [onClose],
+    );
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          id="mobile-menu"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigation menu"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[999] bg-background/98 backdrop-blur-xl lg:hidden"
-          onClick={handleOverlayClick}
-        >
+    return (
+      <AnimatePresence>
+        {isOpen && (
           <motion.div
-            ref={menuRef}
-            className="flex flex-col items-center justify-center h-full gap-8 px-6"
-            variants={menuContentVariants}
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
+            variants={overlayVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[999] bg-background/98 backdrop-blur-xl lg:hidden"
+            onClick={handleOverlayClick}
           >
-            {/* Close button for accessibility */}
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 p-2 text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
-              aria-label="Close menu"
-            >
-              <X size={24} weight="bold" aria-hidden="true" />
-            </button>
-
-            {/* Logo in mobile menu */}
-            <div className="mb-8">
-              <AnimatedLogo size={80} animate />
-            </div>
-
-            {/* Navigation links */}
-            <nav aria-label="Mobile navigation">
-              <ul className="flex flex-col items-center gap-6">
-                {isLandingPage && NAV_LINKS.map((link, index) => (
-                  <li key={link.label}>
-                    <NavLinkButton
-                      link={link}
-                      onClick={onScrollToSection}
-                      variant="mobile"
-                      index={index}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </nav>
-
-            {/* Register CTA */}
             <motion.div
-              variants={menuItemVariants}
-              custom={NAV_LINKS.length}
+              ref={menuRef}
+              className="flex flex-col items-center justify-center h-full px-6 pt-16"
+              variants={menuContentVariants}
               initial="hidden"
               animate="visible"
+              exit="exit"
             >
-              <Link
-                to="/register"
-                onClick={onClose}
-                className="btn-primary text-lg mt-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+              {/* REMOVED DUPLICATE CLOSE BUTTON FROM HERE */}
+
+              {/* Logo in mobile menu */}
+              <div className="mb-8">
+                <AnimatedLogo size={80} animate />
+              </div>
+
+              {/* Navigation links */}
+              <nav aria-label="Mobile navigation">
+                <ul className="flex flex-col items-center gap-6">
+                  {isLandingPage &&
+                    NAV_LINKS.map((link, index) => (
+                      <li key={link.label}>
+                        <NavLinkButton
+                          link={link}
+                          onClick={onScrollToSection}
+                          variant="mobile"
+                          index={index}
+                        />
+                      </li>
+                    ))}
+                </ul>
+              </nav>
+
+              {/* Register CTA */}
+              <motion.div
+                variants={menuItemVariants}
+                custom={NAV_LINKS.length}
+                initial="hidden"
+                animate="visible"
               >
-                Register Now
-              </Link>
+                <Link
+                  to="/register"
+                  onClick={onClose}
+                  className="mt-4 text-lg btn-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+                >
+                  Register Now
+                </Link>
+              </motion.div>
             </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-});
-MobileMenuOverlay.displayName = 'MobileMenuOverlay';
-
+        )}
+      </AnimatePresence>
+    );
+  },
+);
+MobileMenuOverlay.displayName = "MobileMenuOverlay";
 // ═══════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════
@@ -385,21 +380,25 @@ export default function Navigation() {
   const isScrolled = useScrolled();
   const { isOpen, toggle, close } = useMobileMenu();
 
-  const isLandingPage = location.pathname === '/';
+  const isLandingPage = location.pathname === "/";
 
-  const scrollToSection = useCallback((href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-    close();
-  }, [close]);
+  const scrollToSection = useCallback(
+    (href: string) => {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+      close();
+    },
+    [close],
+  );
 
   // Memoize nav background classes
-  const navClassName = `fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${isScrolled
-    ? 'bg-background/90 backdrop-blur-lg border-b border-border/50 shadow-lg shadow-background/20'
-    : 'bg-transparent'
-    }`;
+  const navClassName = `fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${
+    isScrolled
+      ? "bg-background/90 backdrop-blur-lg border-b border-border/50 shadow-lg shadow-background/20"
+      : "bg-transparent"
+  }`;
 
   return (
     <>

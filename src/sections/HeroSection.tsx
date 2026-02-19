@@ -101,7 +101,7 @@ export default function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-screen flex items-center overflow-hidden bg-background"
+      className="relative flex items-center min-h-screen overflow-hidden bg-background"
     >
       {/* Background gradients */}
       <div className="absolute inset-0">
@@ -120,21 +120,21 @@ export default function HeroSection() {
       />
 
       {/* Main container - split layout on desktop */}
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-12 min-h-screen lg:min-h-0 py-0 lg:py-0">
+      <div className="relative z-20 w-full px-4 mx-auto max-w-7xl sm:px-6 lg:px-12">
+        <div className="flex flex-col min-h-screen py-0 lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:min-h-0 lg:py-0">
 
           {/* Left: Content */}
           <div
             ref={contentRef}
-            className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left lg:pt-0"
+            className="flex flex-col items-center flex-1 text-center lg:items-start lg:text-left lg:pt-0"
           >
             {/* Headline */}
             <h1 className="hero-headline font-display font-bold 
-                           text-[2.5rem] leading-[0.95]
-                           sm:text-5xl 
+                           leading-[0.95]
+                           text-6xl 
                            md:text-6xl 
-                           lg:text-7xl 
-                           xl:text-8xl 
+                           lg:text-6xl 
+                           xl:text-7xl 
                            2xl:text-[6.5rem]
                            tracking-tight">
               {siteConfig.hero.headline.map((word, index) => (
@@ -151,30 +151,30 @@ export default function HeroSection() {
             </h1>
 
             {/* Subheadline */}
-            <p className="hero-subheadline body-text mt-6 max-w-sm sm:max-w-md lg:max-w-lg">
+            <p className="max-w-sm mt-6 hero-subheadline body-text sm:max-w-md lg:max-w-lg">
               {siteConfig.hero.subheadline}
             </p>
 
             {/* Countdown Timer */}
-            <div className="hero-countdown mt-8">
-              <p className="label-mono text-muted-foreground mb-3">Event starts in</p>
+            <div className="mt-8 hero-countdown">
+              <p className="mb-3 label-mono text-muted-foreground">Event starts in</p>
               <CountdownTimer />
             </div>
 
             {/* CTA Buttons */}
-            <div className="hero-cta flex flex-col sm:flex-row items-center gap-4 mt-8 w-full sm:w-auto">
+            <div className="flex flex-col items-center w-full gap-4 mt-8 hero-cta sm:flex-row sm:w-auto">
               <Link
                 to="/register"
-                className="btn-primary group text-base w-full sm:w-auto justify-center"
+                className="justify-center w-full text-base btn-primary group sm:w-auto"
               >
                 {siteConfig.hero.ctaPrimary}
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" weight="bold" />
+                <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" weight="bold" />
               </Link>
               <button
                 onClick={() => document.getElementById('timeline')?.scrollIntoView({ behavior: 'smooth' })}
-                className="btn-secondary group text-sm w-full sm:w-auto justify-center"
+                className="justify-center w-full text-sm btn-secondary group sm:w-auto"
               >
-                <CalendarBlank className="mr-2 w-4 h-4" weight="duotone" />
+                <CalendarBlank className="w-4 h-4 mr-2" weight="duotone" />
                 {siteConfig.hero.ctaSecondary}
               </button>
             </div>
@@ -183,12 +183,10 @@ export default function HeroSection() {
           {/* Right: Logo - Large on desktop, centered on mobile */}
           <div
             ref={logoContainerRef}
-            className="hero-logo-entrance flex-shrink-0 flex items-center justify-center
-                       order-first lg:order-last
-                       mt-0 mb-8 lg:my-0"
+            className="flex items-center justify-center flex-shrink-0 order-first mt-0 mb-8 hero-logo-entrance lg:order-last lg:my-0"
           >
             {/* Responsive Opacity Wrapper: 10% on mobile, 100% on desktop */}
-            <div className="opacity-10 md:opacity-100 transition-opacity duration-500">
+            <div className="transition-opacity duration-500 opacity-10 md:opacity-100">
               <AnimatedLogo
                 size={400}
                 className="w-40 h-40 
@@ -205,18 +203,17 @@ export default function HeroSection() {
 
       {/* Scroll indicator */}
       <motion.div
-        className="hero-scroll-indicator absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 
-                   flex flex-col items-center gap-2 cursor-pointer"
+        className="absolute flex flex-col items-center gap-2 -translate-x-1/2 cursor-pointer hero-scroll-indicator bottom-6 sm:bottom-8 left-1/2"
         onClick={() => document.getElementById('what-is')?.scrollIntoView({ behavior: 'smooth' })}
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <span className="text-xs text-muted-foreground hidden sm:block">Scroll to explore</span>
+        <span className="hidden text-xs text-muted-foreground sm:block">Scroll to explore</span>
         <CaretDown className="w-5 h-5 text-primary" weight="bold" />
       </motion.div>
 
       {/* Decorative particles */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}

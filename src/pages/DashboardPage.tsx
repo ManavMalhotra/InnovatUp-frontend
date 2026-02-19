@@ -26,10 +26,10 @@ import * as XLSX from 'xlsx';
 
 // Static event timeline
 const timelineEvents = [
-  { date: 'Feb 22', title: 'Registration Deadline', status: 'completed' },
-  { date: 'Feb 24', title: 'Kickoff Event', status: 'upcoming' },
-  { date: 'Feb 25', title: 'Build Day', status: 'upcoming' },
-  { date: 'Feb 26', title: 'Demo Day', status: 'upcoming' },
+  { date: 'Mar 21', title: 'Registration Deadline', status: 'completed' },
+  { date: 'Mar 24', title: 'Kickoff Event', status: 'upcoming' },
+  { date: 'Mar 24', title: 'Build Day', status: 'upcoming' },
+  { date: 'Mar 24', title: 'Demo Day', status: 'upcoming' },
 ];
 
 export default function DashboardPage() {
