@@ -6,7 +6,6 @@ import { siteConfig } from '../data/siteConfig';
 
 const socialLinks = [
   { icon: InstagramLogo, href: siteConfig.social.instagram, label: 'Instagram' },
-  { icon: LinkedinLogo, href: siteConfig.social.linkedin, label: 'LinkedIn' },
   { icon: EnvelopeSimple, href: `mailto:${siteConfig.social.email}`, label: 'Email' },
 ];
 

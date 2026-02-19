@@ -239,7 +239,7 @@ export const siteConfig = {
     // SOCIAL LINKS
     // ==========================================
     social: {
-        instagram: "https://instagram.com/innovatup",
+        instagram: "https://www.instagram.com/innovatup_society",
         linkedin: "https://linkedin.com/company/innovatup",
         email: "innovatup@bciit.ac.in",
     },

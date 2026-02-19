@@ -234,7 +234,6 @@ export default function DashboardPage() {
                   {[
                     { id: 'overview', label: 'Overview', icon: FileText },
                     { id: 'team', label: 'Team', icon: Users },
-                    { id: 'certificates', label: 'Certificates', icon: Medal },
                   ].map(item => (
                     <button
                       key={item.id}
@@ -515,7 +514,7 @@ export default function DashboardPage() {
           {/* ╔═══════════════════════════════════╗ */}
           {/* ║ PARTICIPANT: Certificates           ║ */}
           {/* ╚═══════════════════════════════════╝ */}
-          {!isAdmin && activeTab === 'certificates' && (
+          {/* {!isAdmin && activeTab === 'certificates' && (
             <motion.div
               className="space-y-8"
               initial={{ opacity: 0, y: 10 }}
@@ -544,7 +543,7 @@ export default function DashboardPage() {
                 </p>
               </div>
             </motion.div>
-          )}
+          )} */}
         </main>
       </div>
     </div>
