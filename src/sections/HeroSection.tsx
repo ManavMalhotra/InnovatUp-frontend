@@ -135,7 +135,6 @@ export default function HeroSection() {
                            md:text-6xl 
                            lg:text-6xl 
                            xl:text-7xl 
-                           2xl:text-[6.5rem]
                            tracking-tight">
               {siteConfig.hero.headline.map((word, index) => (
                 <span

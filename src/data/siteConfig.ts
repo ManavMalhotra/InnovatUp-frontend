@@ -110,7 +110,7 @@ export const siteConfig = {
     timeline: [
         {
             day: "Day 0",
-            date: "Feb 24",
+            date: "Mar 24",
             title: "Kickoff",
             description: "Challenge reveal + team formation.",
             time: "9:00 AM IST",
@@ -118,7 +118,7 @@ export const siteConfig = {
         },
         {
             day: "Day 1",
-            date: "Feb 25",
+            date: "Mar 24",
             title: "Build",
             description: "Mentor rounds + checkpoint reviews.",
             time: "All Day",
@@ -126,7 +126,7 @@ export const siteConfig = {
         },
         {
             day: "Day 2",
-            date: "Feb 26",
+            date: "Mar 24",
             title: "Demo",
             description: "Final pitches + winner announcement.",
             time: "3:00 PM IST",
@@ -139,7 +139,7 @@ export const siteConfig = {
     // ==========================================
     prizes: {
         headline: "Prizes",
-        totalPrizePool: "₹10,000+",
+        totalPrizePool: "₹30,000+",
         categories: [
             {
                 title: "Grand Prize",

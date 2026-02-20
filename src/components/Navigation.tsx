@@ -412,7 +412,12 @@ export default function Navigation() {
       >
         <div className="w-full px-4 sm:px-6 lg:px-12">
           <div className="flex items-center justify-between h-16 lg:h-20">
-            <NavLogo />
+            <div className="flex items-center justify-between">
+              <NavLogo />
+              <span className="ml-2 text-lg font-bold tracking-tight font-display lg:text-xl text-foreground">
+                {"| BCIIT"}
+              </span>
+            </div>
             <DesktopNav
               isLandingPage={isLandingPage}
               onScrollToSection={scrollToSection}
