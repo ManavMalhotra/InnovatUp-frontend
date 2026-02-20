@@ -113,6 +113,16 @@ export default function FooterSection() {
             <p className="mt-4 text-sm text-muted-foreground">
               {siteConfig.social.email}
             </p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Mr Alok Mishra(Assitant Professor) - +91-XXXXXXXXXX
+            </p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Manav Malhotra(Technical Team) - +91-XXXXXXXXXX
+            </p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Saksham Singh(Technical Team) - +91-XXXXXXXXXX
+
+            </p>
           </div>
         </div>
 
