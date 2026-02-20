@@ -1,27 +1,35 @@
-import { motion } from 'motion/react';
-import { Link } from 'react-router-dom';
-import { InstagramLogo, LinkedinLogo, EnvelopeSimple } from '@phosphor-icons/react';
-import AnimatedLogo from '../components/AnimatedLogo';
-import { siteConfig } from '../data/siteConfig';
+import { motion } from "motion/react";
+import { Link } from "react-router-dom";
+import { InstagramLogo, EnvelopeSimple } from "@phosphor-icons/react";
+import AnimatedLogo from "../components/AnimatedLogo";
+import { siteConfig } from "../data/siteConfig";
 
 const socialLinks = [
-  { icon: InstagramLogo, href: siteConfig.social.instagram, label: 'Instagram' },
-  { icon: EnvelopeSimple, href: `mailto:${siteConfig.social.email}`, label: 'Email' },
+  {
+    icon: InstagramLogo,
+    href: siteConfig.social.instagram,
+    label: "Instagram",
+  },
+  {
+    icon: EnvelopeSimple,
+    href: `mailto:${siteConfig.social.email}`,
+    label: "Email",
+  },
 ];
 
 const footerLinks = [
-  { label: 'About', href: '#what-is' },
-  { label: 'Timeline', href: '#timeline' },
-  { label: 'Prizes', href: '#prizes' },
-  { label: 'FAQs', href: '#faqs' },
+  { label: "About", href: "#what-is" },
+  { label: "Timeline", href: "#timeline" },
+  { label: "Prizes", href: "#prizes" },
+  { label: "FAQs", href: "#faqs" },
 ];
 
 export default function FooterSection() {
   const scrollToSection = (href: string) => {
-    if (href.startsWith('#')) {
+    if (href.startsWith("#")) {
       const element = document.querySelector(href);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        element.scrollIntoView({ behavior: "smooth" });
       }
     }
   };
@@ -33,7 +41,7 @@ export default function FooterSection() {
         className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `linear-gradient(transparent 50%, hsl(var(--primary)/0.3) 50%)`,
-          backgroundSize: '100% 4px',
+          backgroundSize: "100% 4px",
         }}
       />
 
@@ -51,9 +59,12 @@ export default function FooterSection() {
               {siteConfig.footer.tagline}
             </p>
             <p className="text-xs text-muted-foreground">
-            <Link to="https://bciit.ac.in" className="transition-colors hover:text-primary">
-              {siteConfig.collegeName}
-            </Link>
+              <Link
+                to="https://bciit.ac.in"
+                className="transition-colors hover:text-primary"
+              >
+                {siteConfig.collegeName}
+              </Link>
             </p>
           </div>
 

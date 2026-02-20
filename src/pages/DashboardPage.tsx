@@ -4,7 +4,6 @@ import { motion } from 'motion/react';
 import {
   Users,
   FileText,
-  Medal,
   SignOut,
   Bell,
   CalendarBlank,
