@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, type Variants } from "motion/react";
 import { List, X } from "@phosphor-icons/react";
 import AnimatedLogo from "./AnimatedLogo";
+import bciit from "../../public/bciit.png";
 
 // ═══════════════════════════════════════════════════════════════════
 // CONSTANTS & TYPES
@@ -32,7 +33,8 @@ const navVariants: Variants = {
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.6, ease: "easeOut" },
+    // Added 'as const' to prevent TypeScript from widening "easeOut" to a generic string
+    transition: { duration: 0.6, ease: "easeOut" as const },
   },
 };
 
@@ -156,12 +158,11 @@ const NavLogo = memo<NavLogoProps>(({ className = "" }) => (
     className={`flex items-center gap-3 group ${className}`}
     aria-label="InnovatUp - Go to homepage"
   >
-    {/* FIXED: Changed to w-10 h-10 (40px) to perfectly contain the 40px logo */}
     <div className="flex items-center justify-center w-10 h-10">
       <AnimatedLogo size={40} animate={false} />
     </div>
     <span className="text-lg font-bold tracking-tight font-display lg:text-xl text-foreground">
-      Innovat<span className="text-primary">Up</span>
+      INNOVAT<span className="text-primary">UP</span>
     </span>
   </Link>
 ));
@@ -324,8 +325,6 @@ const MobileMenuOverlay = memo<MobileMenuOverlayProps>(
               animate="visible"
               exit="exit"
             >
-              {/* REMOVED DUPLICATE CLOSE BUTTON FROM HERE */}
-
               {/* Logo in mobile menu */}
               <div className="mb-8">
                 <AnimatedLogo size={80} animate />
@@ -371,6 +370,7 @@ const MobileMenuOverlay = memo<MobileMenuOverlayProps>(
   },
 );
 MobileMenuOverlay.displayName = "MobileMenuOverlay";
+
 // ═══════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════
@@ -415,6 +415,12 @@ export default function Navigation() {
             <div className="flex items-center justify-between">
               <NavLogo />
               <span className="ml-2 text-lg font-bold tracking-tight font-display lg:text-xl text-foreground">
+                {/* Fixed the `<image>` tag to `<img>` */}
+                <img
+                  src={bciit}
+                  alt="BCIIT Logo"
+                  className="inline-block w-8 h-8 mr-2"
+                />
                 {"| BCIIT"}
               </span>
             </div>

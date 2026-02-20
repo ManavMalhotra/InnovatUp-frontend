@@ -180,6 +180,7 @@ export const siteConfig = {
   // ==========================================
   rules: {
     headline: "Rules & Guidelines",
+    description: "Please follow these rules during the event.",
     items: [
       {
         title: "Team Size",
