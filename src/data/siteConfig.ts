@@ -161,7 +161,7 @@ export const siteConfig = {
             },
         ],
         extras: [
-            "Certificates for all participants",
+            "Certificates",
             "LinkedIn-worthy portfolio project",
             "Networking opportunities",
         ],
