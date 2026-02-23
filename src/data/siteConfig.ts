@@ -142,7 +142,7 @@ export const siteConfig = {
   // ==========================================
   prizes: {
     headline: "Prizes",
-    totalPrizePool: "₹30,000+",
+    totalPrizePool: "₹30,000",
     categories: [
       {
         title: "Grand Prize",

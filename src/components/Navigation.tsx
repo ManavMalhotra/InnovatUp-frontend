@@ -388,8 +388,7 @@ export default function Navigation() {
     [close],
   );
 
-  // Memoize nav background classes
-  const navClassName = `fixed top-0 left-0 right-0 z-[1000] transition-all duration-500 ${isScrolled
+  const navClassName = `fixed top-0 left-0 right-0 w-full z-[1000] safe-padding-x transition-all duration-500 ${isScrolled
     ? "bg-background/80 backdrop-blur-xl border-b border-white/5 shadow-[0_10px_30px_rgba(59,130,246,0.05)] py-0"
     : "bg-transparent py-1 lg:py-2"
     }`;
@@ -422,11 +421,14 @@ export default function Navigation() {
                 </span>
               </div>
             </div>
-            <DesktopNav
-              isLandingPage={isLandingPage}
-              onScrollToSection={scrollToSectionLocal}
-            />
-            <MobileMenuButton isOpen={isOpen} onClick={toggle} />
+
+            <div className="flex items-center gap-4">
+              <DesktopNav
+                isLandingPage={isLandingPage}
+                onScrollToSection={scrollToSectionLocal}
+              />
+              <MobileMenuButton isOpen={isOpen} onClick={toggle} />
+            </div>
           </div>
         </div>
       </motion.nav>

@@ -454,12 +454,10 @@ a:focus-visible {
   }
 }
 
-/* Safe area padding for notched phones */
-@supports(padding: max(0px)) {
-  .fixed {
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-  }
+/* Safe area padding for notched phones - applied to specific containers only, NOT globally */
+.safe-padding-x {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
 }
 
 /* Landscape orientation fixes */

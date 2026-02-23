@@ -118,8 +118,8 @@ const TimeBlock = memo<TimeBlockProps>(({ value, label, isLast }) => (
     <div className="flex items-center">
         <div className="flex flex-col items-center">
             <div className="relative">
-                <div className="w-12 sm:w-16 h-12 sm:h-16 rounded-lg bg-card border border-border flex items-center justify-center overflow-hidden">
-                    <span className="font-display font-bold text-xl sm:text-2xl text-foreground tabular-nums">
+                <div className="w-11 sm:w-16 h-11 sm:h-16 rounded-lg bg-card border border-border flex items-center justify-center overflow-hidden">
+                    <span className="font-display font-bold text-lg sm:text-2xl text-foreground tabular-nums">
                         {String(value).padStart(2, '0')}
                     </span>
                 </div>

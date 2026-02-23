@@ -72,8 +72,7 @@ export default function LandingPage() {
                 {/* Navigation */}
                 <Navigation />
 
-                {/* Sections */}
-                <main className="relative">
+                <main className="relative overflow-hidden w-full">
                     <HeroSection />
                     <AboutSection />
                     <WhoForSection />

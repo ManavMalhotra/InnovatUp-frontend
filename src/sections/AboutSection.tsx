@@ -63,7 +63,7 @@ const PillarCard = memo(function PillarCard({
     return (
         <motion.div
             variants={itemVariants}
-            className={`group relative flex flex-col p-8 lg:p-10 rounded-3xl bg-card/60 backdrop-blur-xl border border-white/5 ${pillar.border} transition-all duration-500 hover:bg-card hover:-translate-y-2 shadow-lg hover:shadow-2xl`}
+            className={`group relative flex flex-col p-6 sm:p-8 lg:p-10 rounded-3xl bg-card/60 backdrop-blur-xl border border-white/5 ${pillar.border} transition-all duration-500 hover:bg-card hover:-translate-y-2 shadow-lg hover:shadow-2xl`}
         >
             {/* Background Gradient */}
             <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${pillar.color} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
@@ -133,12 +133,12 @@ export default function AboutSection() {
                         </span>
                     </div> */}
 
-                    <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black font-display text-white tracking-tighter leading-[1.1] mb-8">
+                    <h2 className="text-3xl sm:text-5xl lg:text-7xl font-black font-display text-white tracking-tighter leading-[1.1] mb-6 sm:mb-8">
                         Bring any idea. <br className="hidden md:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-muted-foreground to-white/80">We provide the mentors.</span>
                     </h2>
 
-                    <p className="text-lg lg:text-2xl text-muted-foreground/80 leading-relaxed font-medium max-w-2xl">
+                    <p className="text-base sm:text-lg lg:text-2xl text-muted-foreground/80 leading-relaxed font-medium max-w-2xl px-2 sm:px-0">
                         InnovatUp isn't a traditional coding hackathon. It's a pure Ideathon.
                         Bring your biggest vision, build your pitch deck, and convince the judges.
                     </p>

@@ -158,7 +158,7 @@ export default function WhoForSection() {
               </span>
 
               {/* Responsive headline with explicit text color */}
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-[1.1] sm:leading-tight">
+              <h2 className="font-display text-4xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-[1.1] sm:leading-tight">
                 Built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">Innovators</span>
                 <br className="hidden sm:block" /> like you.
               </h2>

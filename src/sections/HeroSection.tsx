@@ -127,13 +127,13 @@ export default function HeroSection() {
           {/* Left: Content */}
           <div
             ref={contentRef}
-            className="flex flex-col items-center flex-1 text-center lg:items-start lg:text-left lg:pt-0"
+            className="relative z-10 flex flex-col items-center flex-1 text-center lg:items-start lg:text-left pt-28 sm:pt-32 lg:pt-0"
           >
             {/* Headline */}
             <h1 className="hero-headline font-display font-bold 
                            leading-[0.95]
-                           text-6xl 
-                           md:text-6xl 
+                           text-5xl 
+                           sm:text-6xl 
                            lg:text-6xl 
                            xl:text-7xl 
                            tracking-tight">
@@ -180,23 +180,22 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right: Logo - Large on desktop, centered on mobile */}
+          {/* Right: Logo - Large on desktop only */}
           <div
             ref={logoContainerRef}
-            className="flex items-center justify-center flex-shrink-0 order-first mt-0 mb-8 hero-logo-entrance lg:order-last lg:my-0"
+            className="hidden lg:flex items-center justify-center flex-shrink-0 lg:order-last lg:my-0 hero-logo-entrance"
           >
-            {/* Responsive Opacity Wrapper: 10% on mobile, 100% on desktop */}
-            <div className="transition-opacity duration-500 opacity-10 md:opacity-100">
+            <div className="transition-opacity duration-500 opacity-100">
               <AnimatedLogo
                 size={400}
-                className="w-40 h-40 
-                           sm:w-48 sm:h-48 
-                           md:w-56 md:h-56 
-                           lg:w-80 lg:h-80 
-                           xl:w-96 xl:h-96 
-                           2xl:w-[28rem] 2xl:h-[28rem]"
+                className="lg:w-80 lg:h-80 xl:w-96 xl:h-96 2xl:w-[28rem] 2xl:h-[28rem]"
               />
             </div>
+          </div>
+
+          {/* Mobile ambient background logo */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none lg:hidden z-0 opacity-[0.08] overflow-hidden">
+            <AnimatedLogo size={300} className="w-[120vw] h-[120vw] max-w-[500px] max-h-[500px] hero-logo-entrance transform -translate-y-10" />
           </div>
         </div>
       </div>
