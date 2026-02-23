@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const sections = [
     { id: 'hero', label: 'Home' },
-    { id: 'who-for', label: 'Who For' },
-    { id: 'mentorship', label: 'Mentorship' },
+    { id: 'who-for', label: 'About' },
+    { id: 'prizes', label: 'Prizes' },
+    { id: 'timeline', label: 'Timeline' },
+    { id: 'venue', label: 'Venue' },
     { id: 'rules', label: 'Rules' },
     { id: 'faqs', label: 'FAQs' },
     { id: 'register', label: 'Register' },
@@ -50,9 +52,9 @@ export default function ScrollProgress() {
     const [activeSection, setActiveSection] = useState<string>('hero');
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Use transform instead of spring - cheaper and no physics simulation overhead
-    const { scrollYProgress } = useScroll();
-    const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
+    // Calculate scaleY based on active section index instead of physical scroll
+    const activeIndex = sections.findIndex((s) => s.id === activeSection);
+    const fillPercentage = sections.length > 1 ? activeIndex / (sections.length - 1) : 0;
 
     // Cache element references to avoid repeated DOM queries
     const sectionRefs = useRef<Map<string, HTMLElement>>(new Map());
@@ -117,10 +119,12 @@ export default function ScrollProgress() {
             {/* Progress line background */}
             <div className="absolute left-1/2 -translate-x-1/2 top-4 bottom-4 w-[2px] bg-border rounded-full" />
 
-            {/* Animated progress fill - useTransform is cheaper than useSpring */}
+            {/* Animated progress fill - perfectly aligns with dots */}
             <motion.div
                 className="absolute left-1/2 -translate-x-1/2 top-4 bottom-4 w-[2px] bg-primary rounded-full origin-top"
-                style={{ scaleY }}
+                initial={false}
+                animate={{ scaleY: fillPercentage }}
+                transition={{ type: "spring", stiffness: 100, damping: 20 }}
             />
 
             {/* Section dots */}

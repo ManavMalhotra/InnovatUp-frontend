@@ -20,7 +20,7 @@ const Venue = memo(function Venue() {
   const handleError = useCallback(() => setError(true), []);
 
   return (
-    <section aria-label="Venue" className="relative py-24 md:py-32">
+    <section id="venue" aria-label="Venue" className="relative py-24 md:py-32">
       {/* ambient glow — one, subtle, centered */}
       <div
         className="pointer-events-none absolute top-1/2 left-1/2

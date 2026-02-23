@@ -115,7 +115,7 @@ export const siteConfig = {
       day: "Day 0",
       date: "Mar 24",
       title: "Kickoff",
-      description: "Challenge reveal + team formation.",
+      // description: "Challenge reveal + team formation.",
       time: "9:00 AM IST",
       icon: "rocket",
     },
@@ -123,7 +123,7 @@ export const siteConfig = {
       day: "Day 1",
       date: "Mar 24",
       title: "Build",
-      description: "Mentor rounds + checkpoint reviews.",
+      // description: "Mentor rounds + checkpoint reviews.",
       time: "All Day",
       icon: "hammer",
     },
@@ -131,7 +131,7 @@ export const siteConfig = {
       day: "Day 2",
       date: "Mar 24",
       title: "Demo",
-      description: "Final pitches + winner announcement.",
+      // description: "Final pitches + winner announcement.",
       time: "3:00 PM IST",
       icon: "presentation",
     },
@@ -186,11 +186,11 @@ export const siteConfig = {
         title: "Team Size",
         description: "2-5 members. No solo entries.",
       },
-    //   {
-    //     title: "Submit a PPT",
-    //     description:
-    //       "Send your idea deck before the deadline. Shortlisted teams pitch live.",
-    //   },
+      //   {
+      //     title: "Submit a PPT",
+      //     description:
+      //       "Send your idea deck before the deadline. Shortlisted teams pitch live.",
+      //   },
       {
         title: "Pitch Format",
         description: "3-5 min presentation + 15 min Q&A. Don't go over time.",
@@ -199,16 +199,16 @@ export const siteConfig = {
         title: "Prototype = Bonus",
         description: "Not required, but a working demo gets you extra points.",
       },
-    //   {
-    //     title: "Judging Criteria",
-    //     description:
-    //       "Innovation, real-world impact, technical depth, presentation. Top 3 go to finals.",
-    //   },
-    //   {
-    //     title: "Fair Play",
-    //     description:
-    //       "No plagiarism, no misconduct. Judges' decisions are final.",
-    //   },
+      //   {
+      //     title: "Judging Criteria",
+      //     description:
+      //       "Innovation, real-world impact, technical depth, presentation. Top 3 go to finals.",
+      //   },
+      //   {
+      //     title: "Fair Play",
+      //     description:
+      //       "No plagiarism, no misconduct. Judges' decisions are final.",
+      //   },
     ],
   },
 

@@ -18,8 +18,8 @@ export const SCROLL_TARGETS = {
 
 export const NAV_LINKS = [
     { label: "About", href: SCROLL_TARGETS.ABOUT },
-    { label: "Timeline", href: SCROLL_TARGETS.TIMELINE },
     { label: "Prizes", href: SCROLL_TARGETS.PRIZES },
+    { label: "Timeline", href: SCROLL_TARGETS.TIMELINE },
     { label: "FAQs", href: SCROLL_TARGETS.FAQS },
 ] as const;
 

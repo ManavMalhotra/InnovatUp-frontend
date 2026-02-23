@@ -153,7 +153,7 @@ export default function TimelineSection() {
                             {event.title}
                           </h3>
                           <p className="mt-2 text-sm body-text">
-                            {event.description}
+                            {(event as any).description}
                           </p>
                         </div>
                       </div>

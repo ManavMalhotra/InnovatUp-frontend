@@ -144,14 +144,15 @@ interface NavLogoProps {
 const NavLogo = memo<NavLogoProps>(({ className = "" }) => (
   <Link
     to="/"
-    className={`flex items-center gap-3 group ${className}`}
+    className={`flex items-center gap-2 group ${className}`}
     aria-label="InnovatUp - Go to homepage"
   >
-    <div className="flex items-center justify-center w-10 h-10">
+    <div className="relative flex items-center justify-center w-10 h-10">
+      <div className="absolute inset-0 bg-primary/30 blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <AnimatedLogo size={40} animate={false} />
     </div>
-    <span className="text-lg font-bold tracking-tight font-display lg:text-xl text-foreground">
-      INNOVAT<span className="text-primary">UP</span>
+    <span className="text-xl font-bold tracking-tight font-display text-foreground">
+      Innovat<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Up</span>
     </span>
   </Link>
 ));
@@ -190,11 +191,12 @@ const NavLinkButton = memo<NavLinkButtonProps>(
     return (
       <button
         onClick={handleClick}
-        className="relative text-sm transition-colors duration-200 text-muted-foreground hover:text-foreground group focus:outline-none focus-visible:text-foreground"
+        className="relative px-3 py-2 text-sm font-medium transition-colors duration-300 text-muted-foreground hover:text-white group focus:outline-none"
       >
-        {link.label}
+        <span className="relative z-10">{link.label}</span>
+        <div className="absolute inset-0 rounded-lg bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0 blur-sm" />
         <span
-          className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-full group-focus-visible:w-full"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-300 group-hover:w-[80%]"
           aria-hidden="true"
         />
       </button>
@@ -303,9 +305,13 @@ const MobileMenuOverlay = memo<MobileMenuOverlayProps>(
             animate="visible"
             exit="exit"
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[999] bg-background/98 backdrop-blur-xl lg:hidden"
+            className="fixed inset-0 z-[999] bg-[#080B10]/95 backdrop-blur-2xl lg:hidden overflow-hidden"
             onClick={handleOverlayClick}
           >
+            {/* Ambient Mobile Glows */}
+            <div className="absolute top-0 left-0 w-full h-[50vh] bg-primary/10 rounded-full blur-[100px] pointer-events-none -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-full h-[50vh] bg-accent/10 rounded-full blur-[100px] pointer-events-none translate-y-1/2" />
+
             <motion.div
               ref={menuRef}
               className="flex flex-col items-center justify-center h-full px-6 pt-16"
@@ -383,9 +389,9 @@ export default function Navigation() {
   );
 
   // Memoize nav background classes
-  const navClassName = `fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${isScrolled
-    ? "bg-background/90 backdrop-blur-lg border-b border-border/50 shadow-lg shadow-background/20"
-    : "bg-transparent"
+  const navClassName = `fixed top-0 left-0 right-0 z-[1000] transition-all duration-500 ${isScrolled
+    ? "bg-background/80 backdrop-blur-xl border-b border-white/5 shadow-[0_10px_30px_rgba(59,130,246,0.05)] py-0"
+    : "bg-transparent py-1 lg:py-2"
     }`;
 
   return (
@@ -400,17 +406,21 @@ export default function Navigation() {
       >
         <div className="w-full px-4 sm:px-6 lg:px-12">
           <div className="flex items-center justify-between h-16 lg:h-20">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <NavLogo />
-              <span className="ml-2 text-lg font-bold tracking-tight font-display lg:text-xl text-foreground">
-                {/* Fixed the `<image>` tag to `<img>` */}
+              <div className="hidden sm:flex items-center gap-3 ml-3">
+                <span className="text-xl font-medium text-white/30 mr-2">
+                  |
+                </span>
                 <img
                   src={bciit}
                   alt="BCIIT Logo"
-                  className="inline-block w-8 h-8 mr-2"
+                  className="w-10 h-10 object-contain"
                 />
-                {"| BCIIT"}
-              </span>
+                <span className="text-xl font-bold tracking-tight font-display text-foreground">
+                  BCIIT
+                </span>
+              </div>
             </div>
             <DesktopNav
               isLandingPage={isLandingPage}

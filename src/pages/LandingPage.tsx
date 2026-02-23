@@ -76,9 +76,9 @@ export default function LandingPage() {
                     <HeroSection />
                     <WhoForSection />
                     <Suspense fallback={<div className="min-h-[20vh]" />}>
+                        <PrizesSection />
                         <TimelineSection />
                         <Venue />
-                        <PrizesSection />
                         <RulesSection />
                     </Suspense>
                     {/* Sponsors section removed as requested */}
