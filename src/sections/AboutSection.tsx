@@ -1,6 +1,6 @@
 import { memo, useRef } from "react";
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
-import { Globe, UsersThree, PresentationChart, ShieldCheck } from "@phosphor-icons/react";
+import { Globe, UsersThree, PresentationChart } from "@phosphor-icons/react";
 
 /* ── Animation Variants ── */
 const containerVariants: Variants = {
