@@ -7,6 +7,7 @@ import { ArrowRight, CalendarBlank, CaretDown } from '@phosphor-icons/react';
 import AnimatedLogo from '../components/AnimatedLogo';
 import CountdownTimer from '@/components/CountdownTimer';
 import { siteConfig } from '../data/siteConfig';
+import { ROUTES, SCROLL_TARGETS, scrollToSection } from '../data/routes';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -163,14 +164,14 @@ export default function HeroSection() {
             {/* CTA Buttons */}
             <div className="flex flex-col items-center w-full gap-4 mt-8 hero-cta sm:flex-row sm:w-auto">
               <Link
-                to="/register"
+                to={ROUTES.REGISTER}
                 className="justify-center w-full text-base btn-primary group sm:w-auto"
               >
                 {siteConfig.hero.ctaPrimary}
                 <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" weight="bold" />
               </Link>
               <button
-                onClick={() => document.getElementById('timeline')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => scrollToSection(SCROLL_TARGETS.TIMELINE)}
                 className="justify-center w-full text-sm btn-secondary group sm:w-auto"
               >
                 <CalendarBlank className="w-4 h-4 mr-2" weight="duotone" />
@@ -203,7 +204,7 @@ export default function HeroSection() {
       {/* Scroll indicator */}
       <motion.div
         className="absolute flex flex-col items-center gap-2 -translate-x-1/2 cursor-pointer hero-scroll-indicator bottom-6 sm:bottom-8 left-1/2"
-        onClick={() => document.getElementById('what-is')?.scrollIntoView({ behavior: 'smooth' })}
+        onClick={() => scrollToSection(SCROLL_TARGETS.ABOUT)}
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
       >

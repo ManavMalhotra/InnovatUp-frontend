@@ -22,7 +22,6 @@ const iconMap: Record<
 export default function TimelineSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -44,9 +43,9 @@ export default function TimelineSection() {
         },
       );
 
-      cardsRef.current.forEach((card, index) => {
-        if (!card) return;
+      const cards = gsap.utils.toArray<HTMLElement>('.timeline-card');
 
+      cards.forEach((card, index) => {
         gsap.fromTo(
           card,
           {
@@ -123,21 +122,16 @@ export default function TimelineSection() {
               return (
                 <div
                   key={event.title}
-                  ref={(el) => {
-                    cardsRef.current[index] = el;
-                  }}
-                  className={`relative flex items-center gap-6 lg:gap-0 ${
-                    isLeft ? "lg:flex-row" : "lg:flex-row-reverse"
-                  }`}
+                  className={`timeline-card relative flex items-center gap-6 lg:gap-0 ${isLeft ? "lg:flex-row" : "lg:flex-row-reverse"
+                    }`}
                 >
                   {/* Timeline dot */}
                   <div className="absolute z-10 w-4 h-4 -translate-x-1/2 border-4 rounded-full left-4 lg:left-1/2 bg-primary border-background" />
 
                   {/* Card */}
                   <div
-                    className={`ml-12 lg:ml-0 lg:w-[45%] ${
-                      isLeft ? "lg:pr-12" : "lg:pl-12"
-                    }`}
+                    className={`ml-12 lg:ml-0 lg:w-[45%] ${isLeft ? "lg:pr-12" : "lg:pl-12"
+                      }`}
                   >
                     <motion.div
                       className="p-6 rounded-2xl glass-card-hover"

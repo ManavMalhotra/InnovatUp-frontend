@@ -3,23 +3,13 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, type Variants } from "motion/react";
 import { List, X } from "@phosphor-icons/react";
 import AnimatedLogo from "./AnimatedLogo";
-import bciit from "../../public/bciit.png";
+import bciit from "../../public/bciit.webp";
 
 // ═══════════════════════════════════════════════════════════════════
 // CONSTANTS & TYPES
 // ═══════════════════════════════════════════════════════════════════
 
-interface NavLink {
-  label: string;
-  href: string;
-}
-
-const NAV_LINKS: readonly NavLink[] = [
-  { label: "About", href: "#what-is" },
-  { label: "Timeline", href: "#timeline" },
-  { label: "Prizes", href: "#prizes" },
-  { label: "FAQs", href: "#faqs" },
-] as const;
+import { NAV_LINKS, ROUTES } from "../data/routes";
 
 const SCROLL_THRESHOLD = 100;
 // const SCROLL_THROTTLE_MS = 16; // ~60fps
@@ -95,6 +85,8 @@ const useScrolled = (threshold = SCROLL_THRESHOLD): boolean => {
   return isScrolled;
 };
 
+import { useLockBodyScroll } from "react-use";
+
 /**
  * Manages mobile menu state with body scroll lock
  */
@@ -103,25 +95,22 @@ const useMobileMenu = () => {
   const location = useLocation();
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
+  // Lock body scroll when the menu is open
+  useLockBodyScroll(isOpen);
+
   // Close menu on route change
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  // Handle body scroll lock and focus management
+  // Manage focus restoration
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "";
       // Restore focus when closing
       previousActiveElement.current?.focus();
     }
-
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isOpen]);
 
   // Close on escape key
@@ -171,7 +160,7 @@ NavLogo.displayName = "NavLogo";
 // ─────────────────────────────────────────────────────────────────
 
 interface NavLinkButtonProps {
-  link: NavLink;
+  link: { label: string; href: string };
   onClick: (href: string) => void;
   variant?: "desktop" | "mobile";
   index?: number;
@@ -232,11 +221,11 @@ const DesktopNav = memo<DesktopNavProps>(
             onClick={onScrollToSection}
           />
         ))}
-      <Link to="/login" className="text-sm ">
+      <Link to={ROUTES.LOGIN} className="text-sm ">
         Login
       </Link>
 
-      <Link to="/register" className="btn-primary text-sm py-2.5 px-5">
+      <Link to={ROUTES.REGISTER} className="btn-primary text-sm py-2.5 px-5">
         Register Now
       </Link>
     </div>
@@ -355,7 +344,7 @@ const MobileMenuOverlay = memo<MobileMenuOverlayProps>(
                 animate="visible"
               >
                 <Link
-                  to="/register"
+                  to={ROUTES.REGISTER}
                   onClick={onClose}
                   className="mt-4 text-lg btn-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
                 >
@@ -382,7 +371,7 @@ export default function Navigation() {
 
   const isLandingPage = location.pathname === "/";
 
-  const scrollToSection = useCallback(
+  const scrollToSectionLocal = useCallback(
     (href: string) => {
       const element = document.querySelector(href);
       if (element) {
@@ -394,11 +383,10 @@ export default function Navigation() {
   );
 
   // Memoize nav background classes
-  const navClassName = `fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${
-    isScrolled
-      ? "bg-background/90 backdrop-blur-lg border-b border-border/50 shadow-lg shadow-background/20"
-      : "bg-transparent"
-  }`;
+  const navClassName = `fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${isScrolled
+    ? "bg-background/90 backdrop-blur-lg border-b border-border/50 shadow-lg shadow-background/20"
+    : "bg-transparent"
+    }`;
 
   return (
     <>
@@ -426,7 +414,7 @@ export default function Navigation() {
             </div>
             <DesktopNav
               isLandingPage={isLandingPage}
-              onScrollToSection={scrollToSection}
+              onScrollToSection={scrollToSectionLocal}
             />
             <MobileMenuButton isOpen={isOpen} onClick={toggle} />
           </div>
@@ -437,7 +425,7 @@ export default function Navigation() {
         isOpen={isOpen}
         isLandingPage={isLandingPage}
         onClose={close}
-        onScrollToSection={scrollToSection}
+        onScrollToSection={scrollToSectionLocal}
       />
     </>
   );

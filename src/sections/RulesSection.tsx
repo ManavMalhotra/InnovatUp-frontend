@@ -1,16 +1,10 @@
-import { useRef, useEffect, memo } from "react";
-import { motion, useInView } from "motion/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useRef, memo } from "react";
+import { motion, useInView, type Variants } from "motion/react";
 import { siteConfig } from "../data/siteConfig";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 /* ── animation variants ── */
 
-const headerVariants = {
+const headerVariants: Variants = {
   hidden: { y: 24, opacity: 0 },
   visible: {
     y: 0,
@@ -19,7 +13,27 @@ const headerVariants = {
   },
 };
 
-const noteVariants = {
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.07,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { y: 24, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.45, ease: "easeOut" },
+  },
+};
+
+const noteVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
@@ -60,35 +74,10 @@ SectionHeader.displayName = "SectionHeader";
 
 function RulesSection() {
   const listRef = useRef<HTMLDivElement>(null);
+  const listInView = useInView(listRef, { once: true, margin: "-100px" });
+
   const noteRef = useRef<HTMLDivElement>(null);
   const noteInView = useInView(noteRef, { once: true, margin: "-60px" });
-
-  useEffect(() => {
-    const container = listRef.current;
-    if (!container) return;
-
-    const items = container.querySelectorAll(".rule-item");
-    if (!items.length) return;
-
-    const ctx = gsap.context(() => {
-      gsap.set(items, { y: 24, opacity: 0 });
-
-      gsap.to(items, {
-        y: 0,
-        opacity: 1,
-        duration: 0.45,
-        stagger: 0.07,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: container,
-          start: "top 80%",
-          toggleActions: "play none none reverse",
-        },
-      });
-    }, container);
-
-    return () => ctx.revert();
-  }, []);
 
   const rules = siteConfig.rules.items;
 
@@ -119,11 +108,18 @@ function RulesSection() {
         <SectionHeader />
 
         {/* ── rules list ── */}
-        <div ref={listRef} className="space-y-3">
+        <motion.div
+          ref={listRef}
+          className="space-y-3"
+          initial="hidden"
+          animate={listInView ? "visible" : "hidden"}
+          variants={containerVariants}
+        >
           {rules.map((rule, i) => (
-            <div
+            <motion.div
               key={rule.title}
-              className="rule-item group"
+              variants={itemVariants}
+              className="group"
             >
               <div
                 className="flex items-start gap-4 p-5 transition-colors duration-200 rounded-xl hover:bg-card/50"
@@ -150,9 +146,9 @@ function RulesSection() {
               {i < rules.length - 1 && (
                 <div className="ml-[52px] mr-5 h-px bg-border/40" />
               )}
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* ── fair play note ── */}
         <motion.div

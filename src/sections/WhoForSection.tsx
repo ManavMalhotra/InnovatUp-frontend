@@ -52,13 +52,10 @@ const cardVariants: Variants = {
 // Memoized card component
 const AudienceCard = memo(function AudienceCard({
   audience,
-  index,
 }: {
   audience: { title: string; description: string; icon?: keyof typeof ICON_MAP };
-  index: number;
 }) {
   const Icon = ICON_MAP[audience.icon || 'default'] || ICON_MAP.default;
-  const isEven = index % 2 === 0;
 
   return (
     <motion.div
@@ -69,7 +66,7 @@ const AudienceCard = memo(function AudienceCard({
         hover:border-primary/40 hover:bg-card hover:shadow-lg
         transition-all duration-300 ease-out
         group cursor-pointer
-        ${isEven ? '' : 'lg:translate-y-8'}
+        odd:lg:translate-y-8
       `}
       whileHover={{ y: -4, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
@@ -199,11 +196,10 @@ export default function WhoForSection() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
           >
-            {siteConfig.whoFor.audiences.map((audience, index) => (
+            {siteConfig.whoFor.audiences.map((audience) => (
               <AudienceCard
                 key={audience.title}
                 audience={audience}
-                index={index}
               />
             ))}
           </motion.div>
