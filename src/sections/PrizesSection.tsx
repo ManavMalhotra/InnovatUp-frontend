@@ -119,7 +119,7 @@ export default function PrizesSection() {
         ref={brandWatermarkRef}
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0"
       >
-        <div className="text-[150px] md:text-[250px] lg:text-[350px] font-display font-black leading-none text-white whitespace-nowrap">
+        <div className="text-[25vw] md:text-[250px] lg:text-[350px] font-display font-black leading-none text-white whitespace-nowrap">
           BCIIT
         </div>
       </div>
@@ -141,10 +141,10 @@ export default function PrizesSection() {
         {/* ─────────── TOTAL PRIZE POOL — The Anchor of Greed ─────────── */}
         <div ref={poolRef} className="mb-20 text-center relative max-w-max mx-auto">
           <div className="absolute inset-0 glow-accent-strong rounded-full -z-10 blur-3xl opacity-50" />
-          <div className="relative inline-block py-6 px-12 glass-card-hover rounded-[3rem] border-primary/20 bg-background/40 backdrop-blur-md">
-            <p className="text-6xl font-black leading-none tracking-tighter font-display text-transparent bg-clip-text bg-gradient-to-br from-white via-blue-100 to-primary sm:text-7xl md:text-8xl lg:text-9xl drop-shadow-2xl">
+          <div className="relative inline-block py-4 px-6 sm:py-6 sm:px-12 glass-card-hover rounded-[3rem] border-primary/20 bg-background/40 backdrop-blur-md">
+            <p className="text-5xl min-[400px]:text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-none tracking-tighter font-display text-transparent bg-clip-text bg-gradient-to-br from-white via-blue-100 to-primary drop-shadow-2xl">
               {totalPrizePool}
-              <span className="text-primary inline-block transform translate-y-2 lg:translate-y-4">+</span>
+              <span className="text-primary inline-block transform translate-y-1 sm:translate-y-2 lg:translate-y-4">+</span>
             </p>
             <div className="flex items-center justify-center gap-3 mt-4">
               <div className="h-[1px] w-12 bg-primary/40 rounded"></div>
