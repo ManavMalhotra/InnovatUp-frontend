@@ -9,7 +9,7 @@ export const ROUTES = {
 
 export const SCROLL_TARGETS = {
     HERO: "#hero",
-    ABOUT: "#what-is",
+    ABOUT: "#about",
     TIMELINE: "#timeline",
     PRIZES: "#prizes",
     FAQS: "#faqs",

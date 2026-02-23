@@ -6,6 +6,7 @@ import CustomCursor from "../components/CustomCursor";
 import ScrollProgress from "../components/ScrollProgress";
 import Preloader from "../components/Preloader";
 import HeroSection from "../sections/HeroSection";
+import AboutSection from "../sections/AboutSection";
 import WhoForSection from "../sections/WhoForSection";
 import Venue from "../components/Venue";
 import FAQsSection from "../sections/FAQsSection";
@@ -74,6 +75,7 @@ export default function LandingPage() {
                 {/* Sections */}
                 <main className="relative">
                     <HeroSection />
+                    <AboutSection />
                     <WhoForSection />
                     <Suspense fallback={<div className="min-h-[20vh]" />}>
                         <PrizesSection />

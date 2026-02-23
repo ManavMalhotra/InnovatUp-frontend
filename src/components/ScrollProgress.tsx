@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 
 const sections = [
     { id: 'hero', label: 'Home' },
-    { id: 'who-for', label: 'About' },
+    { id: 'about', label: 'About' },
+    { id: 'who-for', label: 'Who For' },
     { id: 'prizes', label: 'Prizes' },
     { id: 'timeline', label: 'Timeline' },
     { id: 'venue', label: 'Venue' },

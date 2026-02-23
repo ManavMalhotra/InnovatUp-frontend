@@ -161,12 +161,22 @@ export default function FooterSection() {
 
               <div className="pt-4 border-t border-white/10 space-y-3">
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-white">Alok Mishra</span>
-                  <span className="text-xs text-muted-foreground">Faculty Coordinator • +91 XXXXXXXXXX</span>
+                  <span className="text-xs font-semibold text-white">Mr. Alok Mishra</span>
+                  <span className="text-xs text-muted-foreground">
+                    Faculty Coordinator • <a href="tel:+919990584411" className="hover:text-primary transition-colors">+91 9990584411</a>
+                  </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-white">Manav / Saksham</span>
-                  <span className="text-xs text-muted-foreground">Technical Team • +91 XXXXXXXXXX</span>
+                  <span className="text-xs font-semibold text-white">Manav Malhotra</span>
+                  <span className="text-xs text-muted-foreground">
+                    Technical Team • <a href="tel:+918447485557" className="hover:text-primary transition-colors">+91 8447485557</a>
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-white">Saksham Singh</span>
+                  <span className="text-xs text-muted-foreground">
+                    Technical Team • <a href="tel:+919716289023" className="hover:text-primary transition-colors">+91 9716289023</a>
+                  </span>
                 </div>
               </div>
             </div>
