@@ -144,15 +144,17 @@ interface NavLogoProps {
 const NavLogo = memo<NavLogoProps>(({ className = "" }) => (
   <Link
     to="/"
-    className={`flex items-center gap-2 group ${className}`}
+    className={`flex items-center gap-1.5 sm:gap-2 group ${className}`}
     aria-label="InnovatUp - Go to homepage"
   >
-    <div className="relative flex items-center justify-center w-10 h-10">
+    <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10">
       <div className="absolute inset-0 bg-primary/30 blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <AnimatedLogo size={40} animate={false} />
+      <div className="scale-[0.8] sm:scale-100 flex items-center justify-center">
+        <AnimatedLogo size={40} animate={false} />
+      </div>
     </div>
-    <span className="text-xl font-bold tracking-tight font-display text-foreground">
-      Innovat<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Up</span>
+    <span className="text-[15px] sm:text-xl font-bold tracking-tight font-display text-foreground">
+      INNOVAT<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">UP</span>
     </span>
   </Link>
 ));
@@ -321,8 +323,23 @@ const MobileMenuOverlay = memo<MobileMenuOverlayProps>(
               exit="exit"
             >
               {/* Logo in mobile menu */}
-              <div className="mb-8">
-                <AnimatedLogo size={80} animate />
+              <div className="mb-8 flex flex-col items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <AnimatedLogo size={60} animate />
+                  <span className="text-3xl font-bold tracking-tight font-display text-foreground">
+                    INNOVAT<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">UP</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={bciit}
+                    alt="BCIIT Logo"
+                    className="w-14 h-14 object-contain"
+                  />
+                  <span className="text-3xl font-bold tracking-tight font-display text-foreground">
+                    BCIIT
+                  </span>
+                </div>
               </div>
 
               {/* Navigation links */}
@@ -407,16 +424,16 @@ export default function Navigation() {
           <div className="flex items-center justify-between h-16 lg:h-20">
             <div className="flex items-center">
               <NavLogo />
-              <div className="hidden sm:flex items-center gap-3 ml-3">
-                <span className="text-xl font-medium text-white/30 mr-2">
+              <div className="flex items-center gap-1.5 sm:gap-3 ml-1.5 sm:ml-3">
+                <span className="text-base sm:text-xl font-medium text-white/30 mr-1 sm:mr-2">
                   |
                 </span>
                 <img
                   src={bciit}
                   alt="BCIIT Logo"
-                  className="w-10 h-10 object-contain"
+                  className="w-7 h-7 sm:w-10 sm:h-10 object-contain"
                 />
-                <span className="text-xl font-bold tracking-tight font-display text-foreground">
+                <span className="text-[15px] sm:text-xl font-bold tracking-tight font-display text-foreground">
                   BCIIT
                 </span>
               </div>
