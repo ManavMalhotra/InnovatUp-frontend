@@ -170,7 +170,7 @@ export default function TimelineSection() {
 
         {/* Bottom text */}
         <motion.p
-          className="mt-12 text-sm text-center text-muted-foreground"
+          className="mt-12 text-2xl text-center text-muted-foreground"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
