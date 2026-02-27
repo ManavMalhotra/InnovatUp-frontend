@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, type Variants } from "motion/react";
 import { List, X } from "@phosphor-icons/react";
 import AnimatedLogo from "./AnimatedLogo";
-import bciit from "../../public/bciit.webp";
+import bciit from "../../public/bciit.svg";
 
 // ═══════════════════════════════════════════════════════════════════
 // CONSTANTS & TYPES
@@ -148,7 +148,7 @@ const NavLogo = memo<NavLogoProps>(({ className = "" }) => (
     aria-label="InnovatUp - Go to homepage"
   >
     <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10">
-      <div className="absolute inset-0 bg-primary/30 blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 transition-opacity duration-500 rounded-full opacity-0 bg-primary/30 blur-md group-hover:opacity-100" />
       <div className="scale-[0.8] sm:scale-100 flex items-center justify-center">
         <AnimatedLogo size={40} animate={false} />
       </div>
@@ -196,7 +196,7 @@ const NavLinkButton = memo<NavLinkButtonProps>(
         className="relative px-3 py-2 text-sm font-medium transition-colors duration-300 text-muted-foreground hover:text-white group focus:outline-none"
       >
         <span className="relative z-10">{link.label}</span>
-        <div className="absolute inset-0 rounded-lg bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0 blur-sm" />
+        <div className="absolute inset-0 z-0 transition-opacity duration-300 rounded-lg opacity-0 bg-primary/10 group-hover:opacity-100 blur-sm" />
         <span
           className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-300 group-hover:w-[80%]"
           aria-hidden="true"
@@ -323,7 +323,7 @@ const MobileMenuOverlay = memo<MobileMenuOverlayProps>(
               exit="exit"
             >
               {/* Logo in mobile menu */}
-              <div className="mb-8 flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center gap-4 mb-8">
                 <div className="flex items-center gap-3">
                   <AnimatedLogo size={60} animate />
                   <span className="text-3xl font-bold tracking-tight font-display text-foreground">
@@ -334,7 +334,7 @@ const MobileMenuOverlay = memo<MobileMenuOverlayProps>(
                   <img
                     src={bciit}
                     alt="BCIIT Logo"
-                    className="w-14 h-14 object-contain"
+                    className="object-contain bg-white rounded-full w-14 h-14"
                   />
                   <span className="text-3xl font-bold tracking-tight font-display text-foreground">
                     BCIIT
@@ -425,13 +425,13 @@ export default function Navigation() {
             <div className="flex items-center">
               <NavLogo />
               <div className="flex items-center gap-1.5 sm:gap-3 ml-1.5 sm:ml-3">
-                <span className="text-base sm:text-xl font-medium text-white/30 mr-1 sm:mr-2">
+                <span className="mr-1 text-base font-medium sm:text-xl text-white/30 sm:mr-2">
                   |
                 </span>
                 <img
                   src={bciit}
                   alt="BCIIT Logo"
-                  className="w-7 h-7 sm:w-10 sm:h-10 object-contain"
+                  className="object-contain bg-white rounded-full w-7 h-7 sm:w-10 sm:h-10"
                 />
                 <span className="text-[15px] sm:text-xl font-bold tracking-tight font-display text-foreground">
                   BCIIT
