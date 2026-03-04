@@ -113,7 +113,7 @@ module.exports = {
         "rotate-slow": "rotate-slow 20s linear infinite",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         shimmer: "shimmer 3s linear infinite",
-        marquee: "marquee 12s linear infinite",
+        marquee: "marquee 4s linear infinite",
       },
     },
   },

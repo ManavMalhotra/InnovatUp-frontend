@@ -109,7 +109,7 @@ export default function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative flex items-center min-h-screen overflow-hidden bg-background"
+      className="relative flex items-center min-h-[100svh] overflow-hidden bg-background"
     >
       {/* Background gradients */}
       <div className="absolute inset-0">
@@ -134,12 +134,12 @@ export default function HeroSection() {
           {/* Left: Content */}
           <div
             ref={contentRef}
-            className="relative z-10 flex flex-col items-center flex-1 text-center lg:items-start lg:text-left pt-28 sm:pt-32 lg:pt-0"
+            className="relative z-10 flex flex-col items-center flex-1 text-center lg:items-start lg:text-left pt-16 sm:pt-24 lg:pt-20 xl:pt-24 w-full"
           >
             {/* Headline */}
             <h1 className="hero-headline font-display font-bold 
                            leading-[0.95]
-                           text-5xl 
+                           text-[2.75rem] 
                            sm:text-6xl 
                            lg:text-6xl 
                            xl:text-7xl 
@@ -158,39 +158,39 @@ export default function HeroSection() {
             </h1>
 
             {/* Subheadline */}
-            <p className="max-w-sm mt-6 hero-subheadline body-text sm:max-w-md lg:max-w-lg">
+            <p className="max-w-sm mt-2 sm:mt-6 hero-subheadline body-text sm:max-w-md lg:max-w-lg">
               {siteConfig.hero.subheadline}
             </p>
 
             {/* Countdown Timer */}
-            <div className="mt-8 hero-countdown">
-              <p className="mb-3 label-mono text-muted-foreground">Event starts in</p>
+            <div className="mt-4 sm:mt-6 hero-countdown">
+              <p className="mb-2 sm:mb-3 label-mono text-muted-foreground">Event starts in</p>
               <CountdownTimer />
             </div>
 
             {/* Prize Pool Ticker */}
-            <div className="mt-6 hero-prizes w-full sm:w-auto">
-              <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-card/60 backdrop-blur-md border border-primary/20 shadow-[0_0_30px_rgba(59,130,246,0.08)]">
-                <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-primary/15 flex-shrink-0">
-                  <Trophy className="w-4 h-4 text-primary" weight="duotone" />
+            <div className="mt-4 sm:mt-6 hero-prizes w-full sm:max-w-md lg:max-w-lg xl:max-w-xl">
+              <div className="flex items-center gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-[1.25rem] bg-card/60 backdrop-blur-md border border-primary/20 shadow-[0_0_30px_rgba(59,130,246,0.08)]">
+                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/15 flex-shrink-0">
+                  <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-primary" weight="duotone" />
                 </div>
 
-                {/* Marquee container */}
-                <div className="overflow-hidden max-w-[280px] sm:max-w-xs">
-                  <div className="flex animate-marquee whitespace-nowrap">
-                    {[...Array(2)].map((_, i) => (
-                      <span key={i} className="inline-flex items-center gap-2 mr-8">
-                        <span className="text-sm sm:text-base font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-primary">
+                {/* Marquee container with fade mask */}
+                <div className="overflow-hidden flex-1 min-w-0 [mask-image:_linear-gradient(to_right,transparent_0,_black_24px,_black_calc(100%-24px),transparent_100%)]">
+                  <div className="flex animate-marquee whitespace-nowrap hover:[animation-play-state:paused]">
+                    {[...Array(4)].map((_, i) => (
+                      <span key={i} className="inline-flex items-center gap-2 mr-6 sm:mr-8">
+                        <span className="text-sm sm:text-base md:text-lg font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-primary">
                           {siteConfig.prizes.totalPrizePool}+
                         </span>
-                        <span className="text-xs sm:text-sm text-muted-foreground font-medium">
+                        <span className="text-[11px] sm:text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-wider">
                           in Total Prizes
                         </span>
-                        <span className="text-primary/40">✦</span>
-                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">
+                        <span className="text-primary/40 text-[10px] sm:text-xs px-1">✦</span>
+                        <span className="text-[11px] sm:text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider">
                           Win Big at INNOVATUP
                         </span>
-                        <span className="text-primary/40">✦</span>
+                        <span className="text-primary/40 text-[10px] sm:text-xs px-1">✦</span>
                       </span>
                     ))}
                   </div>
@@ -199,7 +199,7 @@ export default function HeroSection() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col items-center w-full gap-4 mt-8 hero-cta sm:flex-row sm:w-auto">
+            <div className="flex flex-col items-center w-full gap-2.5 mt-5 sm:gap-4 sm:mt-8 hero-cta sm:flex-row sm:w-auto">
               <Link
                 to={ROUTES.REGISTER}
                 className="justify-center w-full text-base btn-primary group sm:w-auto"
