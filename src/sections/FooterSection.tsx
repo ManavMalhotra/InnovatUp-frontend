@@ -71,10 +71,10 @@ export default function FooterSection() {
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-black font-display tracking-tight text-foreground">
-                  Innovat<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Up</span>
+                  INNOVAT<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">UP</span>
                 </span>
                 <span className="text-xs font-mono font-medium tracking-[0.2em] text-muted-foreground uppercase mt-1">
-                  Ideathon 2026
+                  National Builders 2026
                 </span>
               </div>
             </Link>
@@ -191,7 +191,7 @@ export default function FooterSection() {
           <div className="flex items-center gap-6">
             <span className="text-sm font-medium text-muted-foreground/60">
               Initiated by{" "}
-              <span className="text-white">InnovatUp Society</span>
+              <span className="text-white">INNOVATUP Society</span>
             </span>
             {/* Decorative element */}
             <div className="flex gap-1 opacity-50">

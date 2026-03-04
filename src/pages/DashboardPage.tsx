@@ -266,7 +266,7 @@ export default function DashboardPage() {
 
     XLSX.writeFile(
       workbook,
-      `InnovatUp_Participants_${new Date().toISOString().split("T")[0]}.xlsx`,
+      `INNOVATUP_Participants_${new Date().toISOString().split("T")[0]}.xlsx`,
     );
   };
 
@@ -339,7 +339,7 @@ export default function DashboardPage() {
             <Link to="/" className="flex items-center gap-2">
               <AnimatedLogo size={32} animate={false} />
               <span className="text-xl font-bold tracking-tight font-display lg:text-2xl text-foreground">
-                Innovat<span className="text-primary">Up</span>
+                INNOVAT<span className="text-primary">UP</span>
               </span>
             </Link>
 
@@ -384,11 +384,10 @@ export default function DashboardPage() {
               {isAdmin ? (
                 <button
                   onClick={() => setActiveTab("overview")}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    activeTab === "overview"
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "overview"
                       ? "bg-primary/10 text-primary font-medium"
                       : "text-muted-foreground hover:text-foreground hover:bg-card"
-                  }`}
+                    }`}
                 >
                   <Table className="w-5 h-5" />
                   <span>All Participants</span>
@@ -402,11 +401,10 @@ export default function DashboardPage() {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                        activeTab === item.id
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === item.id
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-muted-foreground hover:text-foreground hover:bg-card"
-                      }`}
+                        }`}
                     >
                       <item.icon className="w-5 h-5" />
                       <span>{item.label}</span>
@@ -482,7 +480,7 @@ export default function DashboardPage() {
                     className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors rounded-xl border border-border bg-card text-foreground hover:bg-muted/50"
                   >
                     {expandedRows.size === filteredUsers.length &&
-                    filteredUsers.length > 0 ? (
+                      filteredUsers.length > 0 ? (
                       <>
                         <CaretUp className="w-4 h-4" weight="bold" />
                         Collapse All
@@ -624,11 +622,10 @@ export default function DashboardPage() {
                               <tr
                                 key={rowId}
                                 onClick={() => hasMembers && toggleRow(rowId)}
-                                className={`transition-colors ${
-                                  hasMembers
+                                className={`transition-colors ${hasMembers
                                     ? "cursor-pointer hover:bg-muted/20"
                                     : ""
-                                } ${isExpanded ? "bg-primary/5" : ""}`}
+                                  } ${isExpanded ? "bg-primary/5" : ""}`}
                               >
                                 <td className="px-4 py-4 text-center">
                                   {hasMembers ? (
@@ -692,11 +689,10 @@ export default function DashboardPage() {
                                 </td>
                                 <td className="px-4 py-4">
                                   <span
-                                    className={`inline-flex items-center justify-center w-7 h-7 text-xs font-bold rounded-full ${
-                                      teamSize > 1
+                                    className={`inline-flex items-center justify-center w-7 h-7 text-xs font-bold rounded-full ${teamSize > 1
                                         ? "bg-primary/10 text-primary"
                                         : "bg-muted text-muted-foreground"
-                                    }`}
+                                      }`}
                                   >
                                     {teamSize}
                                   </span>
@@ -882,11 +878,10 @@ export default function DashboardPage() {
                   {timelineEvents.map((event, index) => (
                     <div key={index} className="flex items-center gap-4">
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          event.status === "completed"
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${event.status === "completed"
                             ? "bg-primary/20"
                             : "bg-card border border-border"
-                        }`}
+                          }`}
                       >
                         {event.status === "completed" ? (
                           <CheckCircle

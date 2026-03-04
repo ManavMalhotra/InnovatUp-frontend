@@ -139,7 +139,7 @@ export default function AboutSection() {
                     </h2>
 
                     <p className="text-base sm:text-lg lg:text-2xl text-muted-foreground/80 leading-relaxed font-medium max-w-2xl px-2 sm:px-0">
-                        InnovatUp isn't a traditional coding hackathon. It's a pure Ideathon.
+                        INNOVATUP isn't a traditional coding hackathon. It's a pure Ideathon.
                         Bring your biggest vision, build your pitch deck, and convince the judges.
                     </p>
                 </motion.div>

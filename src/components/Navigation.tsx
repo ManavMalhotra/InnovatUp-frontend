@@ -145,7 +145,7 @@ const NavLogo = memo<NavLogoProps>(({ className = "" }) => (
   <Link
     to="/"
     className={`flex items-center gap-1.5 sm:gap-2 group ${className}`}
-    aria-label="InnovatUp - Go to homepage"
+    aria-label="INNOVATUP - Go to homepage"
   >
     <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10">
       <div className="absolute inset-0 transition-opacity duration-500 rounded-full opacity-0 bg-primary/30 blur-md group-hover:opacity-100" />

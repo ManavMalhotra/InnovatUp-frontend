@@ -151,14 +151,14 @@ export default function LoginPage() {
           break;
 
         case "otp-not-verified":
-          otpState.setOtpError("Incorrect OTP. Please check and try again.");
           otpState.resetOtp();
           otpState.focusFirstInput();
+          otpState.setOtpError("Incorrect OTP. Please check and try again.");
           break;
 
         case "no-otp-found":
-          otpState.setOtpError("OTP expired or not found. Please request a new one.");
           otpState.resetOtp();
+          otpState.setOtpError("OTP expired or not found. Please request a new one.");
           break;
 
         case "server-error":
@@ -173,6 +173,7 @@ export default function LoginPage() {
       if (axios.isAxiosError(error)) {
         const result = error.response?.data?.result;
         const detail = error.response?.data?.detail;
+        const status = error.response?.status;
         const detailMsg =
           typeof detail === "string"
             ? detail
@@ -180,18 +181,22 @@ export default function LoginPage() {
               ? detail.map((d: { msg?: string }) => d.msg).join(", ")
               : null;
 
+        // Reset OTP FIRST (resetOtp clears errors internally)
+        otpState.resetOtp();
+        otpState.focusFirstInput();
+
+        // THEN set the error message (after reset)
         if (result === "otp-not-verified") {
           otpState.setOtpError("Incorrect OTP. Please check and try again.");
         } else if (result === "no-otp-found") {
           otpState.setOtpError("OTP expired or not found. Please request a new one.");
         } else if (result === "server-error") {
           otpState.setOtpError("Server error. Please try again later.");
+        } else if (status === 401) {
+          otpState.setOtpError(detailMsg || "Invalid or expired OTP. Please try again.");
         } else {
           otpState.setOtpError(detailMsg || "Verification failed. Please try again.");
         }
-
-        otpState.resetOtp();
-        otpState.focusFirstInput();
       } else {
         otpState.setOtpError("Something went wrong. Please try again.");
       }
@@ -268,7 +273,7 @@ export default function LoginPage() {
         <Link to="/" className="inline-flex items-center gap-3 mb-8">
           <AnimatedLogo size={40} animate={false} />
           <span className="text-xl font-bold font-display text-foreground">
-            Innovat<span className="text-primary">Up</span>
+            INNOVAT<span className="text-primary">UP</span>
           </span>
         </Link>
 

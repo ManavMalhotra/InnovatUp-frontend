@@ -59,7 +59,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
                     >
-                        Innovat<span className="text-primary">Up</span>
+                        INNOVAT<span className="text-primary">UP</span>
                     </motion.h1>
 
                     {/* Loading bar */}

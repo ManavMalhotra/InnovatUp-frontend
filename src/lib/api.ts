@@ -17,11 +17,19 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// Response Interceptor: Handle 401s
+// Response Interceptor: Handle 401s (only for protected endpoints)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Skip redirect for auth endpoints — let page-level handlers show errors
+    const url = error.config?.url || "";
+    const isAuthEndpoint =
+      url.includes("/send-otp") ||
+      url.includes("/verify-otp") ||
+      url.includes("/login") ||
+      url.includes("/reg");
+
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       clearAuth();
       window.location.href = "/login";
     }

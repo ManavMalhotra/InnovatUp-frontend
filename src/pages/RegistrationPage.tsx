@@ -153,14 +153,14 @@ export default function RegistrationPage() {
           break;
 
         case "otp-not-verified":
-          otpState.setOtpError("Incorrect OTP. Please check and try again.");
           otpState.resetOtp();
           otpState.focusFirstInput();
+          otpState.setOtpError("Incorrect OTP. Please check and try again.");
           break;
 
         case "no-otp-found":
-          otpState.setOtpError("OTP expired or not found. Please request a new one.");
           otpState.resetOtp();
+          otpState.setOtpError("OTP expired or not found. Please request a new one.");
           break;
 
         case "server-error":
@@ -175,6 +175,7 @@ export default function RegistrationPage() {
       if (axios.isAxiosError(error)) {
         const result = error.response?.data?.result;
         const detail = error.response?.data?.detail;
+        const status = error.response?.status;
         const detailMsg =
           typeof detail === "string"
             ? detail
@@ -182,18 +183,22 @@ export default function RegistrationPage() {
               ? detail.map((d: { msg?: string }) => d.msg).join(", ")
               : null;
 
+        // Reset OTP FIRST (resetOtp clears errors internally)
+        otpState.resetOtp();
+        otpState.focusFirstInput();
+
+        // THEN set the error message (after reset)
         if (result === "otp-not-verified") {
           otpState.setOtpError("Incorrect OTP. Please check and try again.");
         } else if (result === "no-otp-found") {
           otpState.setOtpError("OTP expired or not found. Please request a new one.");
         } else if (result === "server-error") {
           otpState.setOtpError("Server error. Please try again later.");
+        } else if (status === 401) {
+          otpState.setOtpError(detailMsg || "Invalid or expired OTP. Please try again.");
         } else {
           otpState.setOtpError(detailMsg || "Verification failed. Please try again.");
         }
-
-        otpState.resetOtp();
-        otpState.focusFirstInput();
       } else {
         otpState.setOtpError("Something went wrong. Please try again.");
       }
@@ -269,6 +274,7 @@ export default function RegistrationPage() {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        const result = error.response?.data?.result;
         const detail = error.response?.data?.detail;
         const msg =
           typeof detail === "string"
@@ -276,9 +282,14 @@ export default function RegistrationPage() {
             : Array.isArray(detail)
               ? detail.map((d: { msg?: string }) => d.msg).join(", ")
               : null;
-        setSubmitError(
-          `Registration failed: ${msg || "Please check your inputs and try again."}`,
-        );
+
+        if (result === "already-registered") {
+          setSubmitError("This email is already registered. Please login instead.");
+        } else {
+          setSubmitError(
+            `Registration failed: ${msg || result || "Please check your inputs and try again."}`,
+          );
+        }
       } else {
         setSubmitError("Something went wrong. Please try again.");
       }
@@ -329,7 +340,7 @@ export default function RegistrationPage() {
         <Link to="/" className="inline-flex items-center gap-3 mb-8">
           <AnimatedLogo size={40} animate={false} />
           <span className="text-xl font-bold font-display text-foreground">
-            Innovat<span className="text-primary">Up</span>
+            INNOVAT<span className="text-primary">UP</span>
           </span>
         </Link>
 
@@ -338,7 +349,7 @@ export default function RegistrationPage() {
           {/* Header */}
           <div className="mb-6">
             <h1 className="mb-2 text-2xl font-bold font-display text-foreground">
-              Register for <span className="text-gradient">InnovatUp</span>
+              Register for <span className="text-gradient">INNOVATUP</span>
             </h1>
             <p className="text-sm text-muted-foreground">
               Fill in your details to secure your spot in the ideathon.

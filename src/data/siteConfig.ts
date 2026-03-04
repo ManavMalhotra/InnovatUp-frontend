@@ -9,7 +9,7 @@ export const siteConfig = {
   // ==========================================
   // BASIC INFO
   // ==========================================
-  name: "InnovatUp",
+  name: "INNOVATUP",
   tagline: "Innovate. Build. Launch.",
   description: "A 48-hour ideathon where ideas become reality",
   collegeName: "Banarasidas Chandiwala Institute of Information Technology",
@@ -42,7 +42,7 @@ export const siteConfig = {
   // WHAT IS SECTION
   // ==========================================
   whatIs: {
-    headline: "What is InnovatUp?",
+    headline: "What is INNOVATUP?",
     description:
       "A college-wide ideathon where you pick a challenge, form a team, and ship a prototype in 48 hours. Get mentorship, feedback, and a shot at prizes—plus skills that set you apart from the crowd.",
     stats: {
@@ -251,7 +251,7 @@ export const siteConfig = {
   social: {
     instagram: "https://www.instagram.com/innovatup_society",
     // linkedin: "https://linkedin.com/company/innovatup",
-    email: "innovatup@bciit.ac.in",
+    email: "innovations@bciit.ac.in",
   },
 
   // ==========================================
@@ -267,7 +267,7 @@ export const siteConfig = {
   // ==========================================
   footer: {
     tagline: "Built by students. For students.",
-    copyright: "© 2026 InnovatUp Society, BCIIT. All rights reserved.",
+    copyright: "© 2026 INNOVATUP Society, BCIIT. All rights reserved.",
   },
 };
 

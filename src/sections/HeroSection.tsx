@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, CalendarBlank, CaretDown } from '@phosphor-icons/react';
+import { ArrowRight, CalendarBlank, CaretDown, Trophy } from '@phosphor-icons/react';
 import AnimatedLogo from '../components/AnimatedLogo';
 import CountdownTimer from '@/components/CountdownTimer';
 import { siteConfig } from '../data/siteConfig';
@@ -50,10 +50,17 @@ export default function HeroSection() {
       );
 
       tl.fromTo(
+        '.hero-prizes',
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5 },
+        1.0
+      );
+
+      tl.fromTo(
         '.hero-cta',
         { y: 20, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.5, stagger: 0.1 },
-        1.0
+        1.15
       );
 
       tl.fromTo(
@@ -159,6 +166,36 @@ export default function HeroSection() {
             <div className="mt-8 hero-countdown">
               <p className="mb-3 label-mono text-muted-foreground">Event starts in</p>
               <CountdownTimer />
+            </div>
+
+            {/* Prize Pool Ticker */}
+            <div className="mt-6 hero-prizes w-full sm:w-auto">
+              <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-card/60 backdrop-blur-md border border-primary/20 shadow-[0_0_30px_rgba(59,130,246,0.08)]">
+                <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-primary/15 flex-shrink-0">
+                  <Trophy className="w-4 h-4 text-primary" weight="duotone" />
+                </div>
+
+                {/* Marquee container */}
+                <div className="overflow-hidden max-w-[280px] sm:max-w-xs">
+                  <div className="flex animate-marquee whitespace-nowrap">
+                    {[...Array(2)].map((_, i) => (
+                      <span key={i} className="inline-flex items-center gap-2 mr-8">
+                        <span className="text-sm sm:text-base font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-primary">
+                          {siteConfig.prizes.totalPrizePool}+
+                        </span>
+                        <span className="text-xs sm:text-sm text-muted-foreground font-medium">
+                          in Total Prizes
+                        </span>
+                        <span className="text-primary/40">✦</span>
+                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">
+                          Win Big at INNOVATUP
+                        </span>
+                        <span className="text-primary/40">✦</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* CTA Buttons */}

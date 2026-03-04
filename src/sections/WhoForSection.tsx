@@ -116,7 +116,7 @@ export default function WhoForSection() {
               variants={itemVariants}
               className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-lg leading-relaxed"
             >
-              Whether you&apos;re a deeply technical coder or a first-time visionary, InnovatUp is built for minds that want to ship real products.
+              Whether you&apos;re a deeply technical coder or a first-time visionary, INNOVATUP is built for minds that want to ship real products.
             </motion.p>
 
             <motion.div variants={itemVariants}>
