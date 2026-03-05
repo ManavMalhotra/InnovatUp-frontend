@@ -316,60 +316,84 @@ const MobileMenuOverlay = memo<MobileMenuOverlayProps>(
 
             <motion.div
               ref={menuRef}
-              className="flex flex-col items-center justify-center h-full px-6 pt-16"
+              className="flex flex-col h-full px-6 pt-20 pb-10"
               variants={menuContentVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
-              {/* Logo in mobile menu */}
-              <div className="flex flex-col items-center gap-4 mb-8">
-                <div className="flex items-center gap-3">
-                  <AnimatedLogo size={60} animate />
-                  <span className="text-3xl font-bold tracking-tight font-display text-foreground">
+              {/* Compact logo header */}
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <div className="flex items-center gap-2">
+                  <AnimatedLogo size={36} animate={false} />
+                  <span className="text-lg font-bold tracking-tight font-display text-foreground">
                     INNOVAT<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">UP</span>
                   </span>
                 </div>
-                <div className="flex items-center gap-3">
+                <span className="text-white/20 text-lg">|</span>
+                <div className="flex items-center gap-2">
                   <img
                     src={bciit}
                     alt="BCIIT Logo"
-                    className="object-contain bg-white rounded-full w-14 h-14"
+                    className="object-contain bg-white rounded-full w-8 h-8"
                   />
-                  <span className="text-3xl font-bold tracking-tight font-display text-foreground">
+                  <span className="text-lg font-bold tracking-tight font-display text-foreground">
                     BCIIT
                   </span>
                 </div>
               </div>
 
               {/* Navigation links */}
-              <nav aria-label="Mobile navigation">
-                <ul className="flex flex-col items-center gap-6">
+              <nav aria-label="Mobile navigation" className="flex-1 flex flex-col items-center justify-center">
+                <ul className="flex flex-col items-center gap-1 w-full">
                   {isLandingPage &&
                     NAV_LINKS.map((link, index) => (
-                      <li key={link.label}>
-                        <NavLinkButton
-                          link={link}
-                          onClick={onScrollToSection}
-                          variant="mobile"
-                          index={index}
-                        />
+                      <li key={link.label} className="w-full">
+                        <motion.button
+                          onClick={() => onScrollToSection(link.href)}
+                          className="w-full px-4 py-3 text-lg font-semibold text-center transition-colors rounded-xl font-display text-muted-foreground hover:text-white hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                          variants={menuItemVariants}
+                          custom={index}
+                          initial="hidden"
+                          animate="visible"
+                        >
+                          {link.label}
+                        </motion.button>
                       </li>
                     ))}
+
+                  {/* Login — part of the nav list */}
+                  <li className="w-full">
+                    <motion.div
+                      variants={menuItemVariants}
+                      custom={NAV_LINKS.length}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <Link
+                        to={ROUTES.LOGIN}
+                        onClick={onClose}
+                        className="block w-full px-4 py-3 text-lg font-semibold text-center transition-colors rounded-xl font-display text-muted-foreground hover:text-white hover:bg-white/5"
+                      >
+                        Login
+                      </Link>
+                    </motion.div>
+                  </li>
                 </ul>
               </nav>
 
-              {/* Register CTA */}
+              {/* Register CTA — pinned to bottom area */}
               <motion.div
                 variants={menuItemVariants}
-                custom={NAV_LINKS.length}
+                custom={NAV_LINKS.length + 1}
                 initial="hidden"
                 animate="visible"
+                className="mt-auto pt-6 border-t border-white/10"
               >
                 <Link
                   to={ROUTES.REGISTER}
                   onClick={onClose}
-                  className="mt-4 text-lg btn-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+                  className="block w-full text-center text-base btn-primary py-3.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
                 >
                   Register Now
                 </Link>

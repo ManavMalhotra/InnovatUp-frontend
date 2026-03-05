@@ -226,13 +226,14 @@ export default function HeroSection() {
               <AnimatedLogo
                 size={400}
                 className="lg:w-80 lg:h-80 xl:w-96 xl:h-96 2xl:w-[28rem] 2xl:h-[28rem]"
+                wireframe
               />
             </div>
           </div>
 
           {/* Mobile ambient background logo */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none lg:hidden z-0 opacity-[0.08] overflow-hidden">
-            <AnimatedLogo size={300} className="w-[120vw] h-[120vw] max-w-[500px] max-h-[500px] hero-logo-entrance transform -translate-y-10" />
+            <AnimatedLogo size={300} className="w-[120vw] h-[120vw] max-w-[500px] max-h-[500px] hero-logo-entrance transform -translate-y-10" wireframe />
           </div>
         </div>
       </div>
