@@ -13,7 +13,7 @@ import {
   ShieldCheck,
   CircleNotch,
 } from "@phosphor-icons/react";
-import AnimatedLogo from "../components/AnimatedLogo";
+import AuthNavbar from "../components/AuthNavbar";
 import OtpVerification from "../components/OtpVerification";
 import { useOtp, maskEmail } from "../hooks/useOtp";
 import api from "../lib/api";
@@ -334,30 +334,24 @@ export default function RegistrationPage() {
   //  Main Render
   // ═══════════════════════════════════════
   return (
-    <div className="min-h-screen px-6 py-8 pb-20 bg-background">
+    <div className="min-h-screen px-4 sm:px-6 pt-16 pb-8 bg-background">
+      <AuthNavbar />
       <div className="max-w-2xl mx-auto">
-        {/* Logo */}
-        <Link to="/" className="inline-flex items-center gap-3 mb-8">
-          <AnimatedLogo size={40} animate={false} />
-          <span className="text-xl font-bold font-display text-foreground">
-            INNOVAT<span className="text-primary">UP</span>
-          </span>
-        </Link>
 
         {/* Glass Card */}
-        <div className="p-6 border bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl sm:p-8">
+        <div className="p-4 border bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl sm:p-6">
           {/* Header */}
-          <div className="mb-6">
-            <h1 className="mb-2 text-2xl font-bold font-display text-foreground">
+          <div className="mb-3">
+            <h1 className="mb-1 text-xl sm:text-2xl font-bold font-display text-foreground">
               Register for <span className="text-gradient">INNOVATUP</span>
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Fill in your details to secure your spot in the ideathon.
             </p>
           </div>
 
           {/* Progress Bar */}
-          <div className="flex gap-2 mb-8">
+          <div className="flex gap-2 mb-5">
             {[1, 2, 3].map((s) => (
               <motion.div
                 key={s}
@@ -371,28 +365,27 @@ export default function RegistrationPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* ╔═══════════════════════════════╗ */}
             {/* ║  STEP 1 — Leader Details      ║ */}
             {/* ╚═══════════════════════════════╝ */}
             {step === 1 && !showOtpStep && (
               <motion.div
-                className="space-y-6"
+                className="space-y-4"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="mb-6 text-xl font-bold font-display text-foreground">
+                <h2 className="mb-3 text-lg font-bold font-display text-foreground">
                   Team Leader Details
                 </h2>
 
-                {/* Full Name */}
                 <div>
-                  <label className="block mb-2 label-mono text-muted-foreground">
+                  <label className="block mb-1.5 text-xs label-mono text-muted-foreground">
                     Full Name
                   </label>
                   <div className="relative">
-                    <User className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                    <User className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
                     <input
                       type="text"
                       required
@@ -400,20 +393,19 @@ export default function RegistrationPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, leaderName: e.target.value })
                       }
-                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      className="w-full py-3 pl-10 pr-4 text-sm transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                       placeholder="John Doe"
                     />
                   </div>
                 </div>
 
-                {/* Email */}
                 <div>
-                  <label className="block mb-2 label-mono text-muted-foreground">
+                  <label className="block mb-1.5 text-xs label-mono text-muted-foreground">
                     Email ID
                   </label>
                   <div className="relative">
                     <EnvelopeSimple
-                      className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground"
+                      className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground"
                       weight="duotone"
                     />
                     <input
@@ -426,7 +418,7 @@ export default function RegistrationPage() {
                           setEmailVerified(false);
                         }
                       }}
-                      className={`w-full py-4 pl-12 pr-12 transition-all border bg-card rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary ${emailVerified ? "border-green-500/50" : "border-border"
+                      className={`w-full py-3 pl-10 pr-12 text-sm transition-all border bg-card rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary ${emailVerified ? "border-green-500/50" : "border-border"
                         }`}
                       placeholder="you@college.edu"
                     />
@@ -455,13 +447,12 @@ export default function RegistrationPage() {
                   )}
                 </div>
 
-                {/* Mobile */}
                 <div>
-                  <label className="block mb-2 label-mono text-muted-foreground">
+                  <label className="block mb-1.5 text-xs label-mono text-muted-foreground">
                     Mobile Number
                   </label>
                   <div className="relative">
-                    <Phone className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                    <Phone className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
                     <input
                       type="tel"
                       required
@@ -469,7 +460,7 @@ export default function RegistrationPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, mobile: e.target.value })
                       }
-                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      className="w-full py-3 pl-10 pr-4 text-sm transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                       placeholder="+91 98765 43210"
                     />
                   </div>
@@ -545,22 +536,21 @@ export default function RegistrationPage() {
             {/* ╚═══════════════════════════════╝ */}
             {step === 2 && (
               <motion.div
-                className="space-y-6"
+                className="space-y-4"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="mb-6 text-xl font-bold font-display text-foreground">
+                <h2 className="mb-3 text-lg font-bold font-display text-foreground">
                   Team Information
                 </h2>
 
-                {/* Team Name */}
                 <div>
-                  <label className="block mb-2 label-mono text-muted-foreground">
+                  <label className="block mb-1.5 text-xs label-mono text-muted-foreground">
                     Team Name
                   </label>
                   <div className="relative">
-                    <Users className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                    <Users className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
                     <input
                       type="text"
                       required
@@ -568,42 +558,33 @@ export default function RegistrationPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, teamName: e.target.value })
                       }
-                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      className="w-full py-3 pl-10 pr-4 text-sm transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                       placeholder="Team Innovators"
                     />
                   </div>
                 </div>
 
-                {/* Team Size */}
                 <div>
-                  <label className="block mb-3 label-mono text-muted-foreground">
+                  <label className="block mb-2 text-xs label-mono text-muted-foreground">
                     Number of Team Members
                   </label>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-4 gap-2 sm:gap-3">
                     {[2, 3, 4, 5].map((size) => (
                       <button
                         key={size}
                         type="button"
                         onClick={() => handleTeamSizeChange(size.toString())}
                         className={`
-                        py-4 rounded-xl border transition-all duration-200
-                        flex flex-col items-center justify-center gap-2
+                        py-3 rounded-xl border transition-all duration-200
+                        flex flex-col items-center justify-center gap-1
                         ${Number(formData.teamSize) === size
                             ? "bg-primary/10 border-primary text-primary shadow-[0_0_20px_rgba(59,130,246,0.15)]"
                             : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-card/80"
                           }
                       `}
                       >
-                        <Users
-                          weight={
-                            Number(formData.teamSize) === size
-                              ? "duotone"
-                              : "regular"
-                          }
-                          className="w-6 h-6"
-                        />
-                        <span className="text-lg font-bold font-display">
-                          {size} Members
+                        <span className="text-sm font-bold font-display">
+                          {size}
                         </span>
                       </button>
                     ))}
@@ -650,7 +631,7 @@ export default function RegistrationPage() {
                         />
                       </div>
                       <div className="relative">
-                        <Phone className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                        <Phone className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
                         <input
                           type="tel"
                           required
@@ -660,7 +641,7 @@ export default function RegistrationPage() {
                             newMembers[index].mobile = e.target.value;
                             setTeamMembers(newMembers);
                           }}
-                          className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                          className="w-full py-3 pl-10 pr-4 text-sm transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                           placeholder="+91 98765 43210"
                         />
                       </div>
@@ -695,21 +676,21 @@ export default function RegistrationPage() {
             {/* ╚═══════════════════════════════╝ */}
             {step === 3 && (
               <motion.div
-                className="space-y-6"
+                className="space-y-4"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="mb-6 text-xl font-bold font-display text-foreground">
+                <h2 className="mb-3 text-lg font-bold font-display text-foreground">
                   Idea Details
                 </h2>
 
                 <div>
-                  <label className="block mb-2 label-mono text-muted-foreground">
+                  <label className="block mb-1.5 text-xs label-mono text-muted-foreground">
                     Topic/Theme
                   </label>
                   <div className="relative">
-                    <Lightbulb className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground" />
+                    <Lightbulb className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
                     <input
                       type="text"
                       required
@@ -717,19 +698,19 @@ export default function RegistrationPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, topic: e.target.value })
                       }
-                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      className="w-full py-3 pl-10 pr-4 text-sm transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                       placeholder="AI for Healthcare"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block mb-2 label-mono text-muted-foreground">
+                  <label className="block mb-1.5 text-xs label-mono text-muted-foreground">
                     Institute/College
                   </label>
                   <div className="relative">
                     <Buildings
-                      className="absolute w-5 h-5 -translate-y-1/2 left-4 top-1/2 text-muted-foreground"
+                      className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground"
                       weight="duotone"
                     />
                     <input
@@ -739,26 +720,26 @@ export default function RegistrationPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, institute: e.target.value })
                       }
-                      className="w-full py-4 pl-12 pr-4 transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      className="w-full py-3 pl-10 pr-4 text-sm transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                       placeholder="Your College Name"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block mb-2 label-mono text-muted-foreground">
+                  <label className="block mb-1.5 text-xs label-mono text-muted-foreground">
                     Brief Description of Idea
                   </label>
                   <div className="relative">
-                    <FileText className="absolute w-5 h-5 left-4 top-4 text-muted-foreground" />
+                    <FileText className="absolute w-4 h-4 left-3 top-3.5 text-muted-foreground" />
                     <textarea
                       required
-                      rows={4}
+                      rows={3}
                       value={formData.idea_desc}
                       onChange={(e) =>
                         setFormData({ ...formData, idea_desc: e.target.value })
                       }
-                      className="w-full py-4 pl-12 pr-4 transition-all border resize-none bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                      className="w-full py-3 pl-10 pr-4 text-sm transition-all border resize-none bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                       placeholder="Describe your idea in a few sentences..."
                     />
                   </div>
@@ -793,7 +774,7 @@ export default function RegistrationPage() {
         </div>
 
         {/* Login link */}
-        <p className="mt-8 text-center text-muted-foreground">
+        <p className="mt-4 text-center text-sm text-muted-foreground">
           Already registered?{' '}
           <Link to="/login" className="font-medium text-primary hover:underline">
             Login here

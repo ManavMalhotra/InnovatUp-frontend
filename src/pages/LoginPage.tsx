@@ -7,7 +7,7 @@ import {
   CircleNotch,
   Check,
 } from "@phosphor-icons/react";
-import AnimatedLogo from "../components/AnimatedLogo";
+import AuthNavbar from "../components/AuthNavbar";
 import OtpVerification from "../components/OtpVerification";
 import { useOtp, maskEmail } from "../hooks/useOtp";
 import api from "../lib/api";
@@ -267,15 +267,9 @@ export default function LoginPage() {
   //  Main Render
   // ═══════════════════════════════════════
   return (
-    <div className="flex items-center justify-center min-h-screen px-6 py-12 bg-background">
+    <div className="flex items-center justify-center min-h-screen px-6 pt-20 pb-12 bg-background">
+      <AuthNavbar />
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <Link to="/" className="inline-flex items-center gap-3 mb-8">
-          <AnimatedLogo size={40} animate={false} />
-          <span className="text-xl font-bold font-display text-foreground">
-            INNOVAT<span className="text-primary">UP</span>
-          </span>
-        </Link>
 
         {/* Glass Card */}
         <div className="p-6 border bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl sm:p-8">

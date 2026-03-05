@@ -178,20 +178,25 @@ export default function HeroSection() {
                 {/* Marquee container with fade mask */}
                 <div className="overflow-hidden flex-1 min-w-0 [mask-image:_linear-gradient(to_right,transparent_0,_black_24px,_black_calc(100%-24px),transparent_100%)]">
                   <div className="flex animate-marquee whitespace-nowrap hover:[animation-play-state:paused]">
-                    {[...Array(4)].map((_, i) => (
-                      <span key={i} className="inline-flex items-center gap-2 mr-6 sm:mr-8">
-                        <span className="text-sm sm:text-base md:text-lg font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-primary">
-                          {siteConfig.prizes.totalPrizePool}+
-                        </span>
-                        <span className="text-[11px] sm:text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-wider">
-                          in Total Prizes
-                        </span>
-                        <span className="text-primary/40 text-[10px] sm:text-xs px-1">✦</span>
-                        <span className="text-[11px] sm:text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                          Win Big at INNOVATUP
-                        </span>
-                        <span className="text-primary/40 text-[10px] sm:text-xs px-1">✦</span>
-                      </span>
+                    {/* Two identical groups create the seamless infinite loop illusion */}
+                    {[0, 1].map((group) => (
+                      <div key={group} className="flex shrink-0">
+                        {[...Array(12)].map((_, i) => (
+                          <span key={i} className="inline-flex items-center gap-2 mr-6 sm:mr-8">
+                            <span className="text-sm sm:text-base md:text-lg font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-primary">
+                              {siteConfig.prizes.totalPrizePool}+
+                            </span>
+                            <span className="text-[11px] sm:text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                              in Total Prizes
+                            </span>
+                            <span className="text-primary/40 text-[10px] sm:text-xs px-1">✦</span>
+                            <span className="text-[11px] sm:text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                              Win Big at INNOVATUP
+                            </span>
+                            <span className="text-primary/40 text-[10px] sm:text-xs px-1">✦</span>
+                          </span>
+                        ))}
+                      </div>
                     ))}
                   </div>
                 </div>
