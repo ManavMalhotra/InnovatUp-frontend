@@ -36,6 +36,23 @@ interface TeamRegistration {
   idea_desc: string;
 }
 
+const PHONE_PLACEHOLDER = "9876543210";
+const PHONE_DIGIT_COUNT = 10;
+
+function normalizePhoneNumber(value: string): string {
+  const digitsOnly = value.replace(/\D/g, "");
+
+  if (digitsOnly.startsWith("91") && digitsOnly.length > PHONE_DIGIT_COUNT) {
+    return digitsOnly.slice(2, 2 + PHONE_DIGIT_COUNT);
+  }
+
+  return digitsOnly.slice(0, PHONE_DIGIT_COUNT);
+}
+
+function isValidPhoneNumber(value: string): boolean {
+  return normalizePhoneNumber(value).length === PHONE_DIGIT_COUNT;
+}
+
 export default function RegistrationPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -57,6 +74,7 @@ export default function RegistrationPage() {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [stepError, setStepError] = useState("");
 
   // ═══════════════════════════════════════
   //  OTP Verification State
@@ -74,6 +92,8 @@ export default function RegistrationPage() {
   //  Send OTP
   // ═══════════════════════════════════════
   const handleSendOtp = async () => {
+    const normalizedLeaderPhone = normalizePhoneNumber(formData.mobile);
+
     if (!formData.leaderName.trim()) {
       otpState.setOtpError("Please enter your full name");
       return;
@@ -90,6 +110,10 @@ export default function RegistrationPage() {
       otpState.setOtpError("Please enter your mobile number");
       return;
     }
+    if (!isValidPhoneNumber(formData.mobile)) {
+      otpState.setOtpError("Please enter a valid 10-digit mobile number");
+      return;
+    }
 
     setSendingOtp(true);
     otpState.setOtpError("");
@@ -104,6 +128,7 @@ export default function RegistrationPage() {
       otpState.startResendTimer();
       otpState.resetOtp();
       otpState.focusFirstInput(300);
+      setFormData((prev) => ({ ...prev, mobile: normalizedLeaderPhone }));
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const detail = error.response?.data?.detail;
@@ -218,6 +243,7 @@ export default function RegistrationPage() {
   const handleTeamSizeChange = (size: string) => {
     const newSize = parseInt(size);
     const currentSize = teamMembers.length;
+    setStepError("");
 
     if (newSize > currentSize + 1) {
       const newMembers = [...teamMembers];
@@ -230,6 +256,46 @@ export default function RegistrationPage() {
     }
 
     setFormData({ ...formData, teamSize: newSize });
+  };
+
+  const validateStepTwo = () => {
+    if (!formData.teamName.trim()) {
+      setStepError("Please enter your team name.");
+      return false;
+    }
+
+    for (let index = 0; index < teamMembers.length; index += 1) {
+      const member = teamMembers[index];
+      const memberNumber = index + 2;
+
+      if (!member.name.trim()) {
+        setStepError(`Please enter Team Member ${memberNumber}'s full name.`);
+        return false;
+      }
+
+      if (!member.email.trim()) {
+        setStepError(`Please enter Team Member ${memberNumber}'s email address.`);
+        return false;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member.email)) {
+        setStepError(`Please enter a valid email for Team Member ${memberNumber}.`);
+        return false;
+      }
+
+      if (!member.mobile.trim()) {
+        setStepError(`Please enter Team Member ${memberNumber}'s mobile number.`);
+        return false;
+      }
+
+      if (!isValidPhoneNumber(member.mobile)) {
+        setStepError(`Please enter a valid 10-digit mobile number for Team Member ${memberNumber}.`);
+        return false;
+      }
+    }
+
+    setStepError("");
+    return true;
   };
 
   // ═══════════════════════════════════════
@@ -245,28 +311,43 @@ export default function RegistrationPage() {
     }
 
     setSubmitError("");
+    setStepError("");
+
+    if (!validateStepTwo()) {
+      setStep(2);
+      return;
+    }
+
+    if (!isValidPhoneNumber(formData.mobile)) {
+      setSubmitError("Please enter a valid 10-digit mobile number for the team leader.");
+      setStep(1);
+      return;
+    }
+
+    const normalizedLeaderPhone = normalizePhoneNumber(formData.mobile);
+    const cleanTeamMembers = teamMembers.map((member) => ({
+      name: member.name.trim(),
+      email: member.email.trim(),
+      mobile: normalizePhoneNumber(member.mobile),
+    }));
 
     const formDataToSend = new FormData();
-    formDataToSend.append("leaderName", formData.leaderName);
-    formDataToSend.append("email", formData.email);
-    formDataToSend.append("mobile", formData.mobile);
-    formDataToSend.append("topic", formData.topic);
-    formDataToSend.append("teamName", formData.teamName);
+    formDataToSend.append("leaderName", formData.leaderName.trim());
+    formDataToSend.append("email", formData.email.trim());
+    formDataToSend.append("mobile", normalizedLeaderPhone);
+    formDataToSend.append("topic", formData.topic.trim());
+    formDataToSend.append("teamName", formData.teamName.trim());
     formDataToSend.append("team_count", teamMembers.length.toString());
-    formDataToSend.append("institute", formData.institute);
-    formDataToSend.append("idea_desc", formData.idea_desc);
-
-    const cleanTeamMembers = teamMembers.map((member) => ({
-      name: member.name,
-      email: member.email,
-      mobile: member.mobile,
-    }));
+    formDataToSend.append("institute", formData.institute.trim());
+    formDataToSend.append("idea_desc", formData.idea_desc.trim());
     formDataToSend.append("team_members", JSON.stringify(cleanTeamMembers));
 
     try {
       const response = await api.post("/reg", formDataToSend);
 
       if (response.status === 200 || response.status === 201) {
+        setFormData((prev) => ({ ...prev, mobile: normalizedLeaderPhone }));
+        setTeamMembers(cleanTeamMembers);
         setIsSubmitted(true);
         setTimeout(() => {
           navigate("/dashboard");
@@ -334,7 +415,7 @@ export default function RegistrationPage() {
   //  Main Render
   // ═══════════════════════════════════════
   return (
-    <div className="min-h-screen px-4 sm:px-6 pt-16 pb-8 bg-background">
+    <div className="min-h-screen px-4 pt-16 pb-8 sm:px-6 bg-background">
       <AuthNavbar />
       <div className="max-w-2xl mx-auto">
 
@@ -342,7 +423,7 @@ export default function RegistrationPage() {
         <div className="p-4 border bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl sm:p-6">
           {/* Header */}
           <div className="mb-3">
-            <h1 className="mb-1 text-xl sm:text-2xl font-bold font-display text-foreground">
+            <h1 className="mb-1 text-xl font-bold sm:text-2xl font-display text-foreground">
               Register for <span className="text-gradient">INNOVATUP</span>
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground">
@@ -457,13 +538,20 @@ export default function RegistrationPage() {
                       type="tel"
                       required
                       value={formData.mobile}
-                      onChange={(e) =>
-                        setFormData({ ...formData, mobile: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setFormData({
+                          ...formData,
+                          mobile: normalizePhoneNumber(e.target.value),
+                        });
+                        otpState.setOtpError("");
+                      }}
                       className="w-full py-3 pl-10 pr-4 text-sm transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                      placeholder="+91 98765 43210"
+                      placeholder={PHONE_PLACEHOLDER}
                     />
                   </div>
+                  <p className="mt-1.5 text-xs text-muted-foreground">
+                    Country code is optional. We&apos;ll save only the 10-digit mobile number.
+                  </p>
                 </div>
 
                 {/* Error from OTP sending */}
@@ -555,9 +643,10 @@ export default function RegistrationPage() {
                       type="text"
                       required
                       value={formData.teamName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, teamName: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setFormData({ ...formData, teamName: e.target.value });
+                        setStepError("");
+                      }}
                       className="w-full py-3 pl-10 pr-4 text-sm transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                       placeholder="Team Innovators"
                     />
@@ -613,6 +702,7 @@ export default function RegistrationPage() {
                             const newMembers = [...teamMembers];
                             newMembers[index].name = e.target.value;
                             setTeamMembers(newMembers);
+                            setStepError("");
                           }}
                           className="w-full px-4 py-3 transition-all border bg-background border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                         />
@@ -626,6 +716,7 @@ export default function RegistrationPage() {
                             const newMembers = [...teamMembers];
                             newMembers[index].email = e.target.value;
                             setTeamMembers(newMembers);
+                            setStepError("");
                           }}
                           className="w-full px-4 py-3 transition-all border bg-background border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                         />
@@ -638,16 +729,29 @@ export default function RegistrationPage() {
                           value={member.mobile}
                           onChange={(e) => {
                             const newMembers = [...teamMembers];
-                            newMembers[index].mobile = e.target.value;
+                            newMembers[index].mobile = normalizePhoneNumber(
+                              e.target.value,
+                            );
                             setTeamMembers(newMembers);
+                            setStepError("");
                           }}
                           className="w-full py-3 pl-10 pr-4 text-sm transition-all border bg-card border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                          placeholder="+91 98765 43210"
+                          placeholder={PHONE_PLACEHOLDER}
                         />
                       </div>
                     </div>
                   </motion.div>
                 ))}
+
+                {stepError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 text-sm text-center text-red-400 border rounded-lg bg-red-500/5 border-red-500/20"
+                  >
+                    {stepError}
+                  </motion.div>
+                )}
 
                 <div className="flex gap-4">
                   <button
@@ -662,7 +766,10 @@ export default function RegistrationPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setStep(3)}
+                    onClick={() => {
+                      if (!validateStepTwo()) return;
+                      setStep(3);
+                    }}
                     className="flex-1 btn-primary"
                   >
                     Continue
@@ -774,7 +881,7 @@ export default function RegistrationPage() {
         </div>
 
         {/* Login link */}
-        <p className="mt-4 text-center text-sm text-muted-foreground">
+        <p className="mt-4 text-sm text-center text-muted-foreground">
           Already registered?{' '}
           <Link to="/login" className="font-medium text-primary hover:underline">
             Login here
